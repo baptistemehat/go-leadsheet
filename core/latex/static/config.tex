@@ -1,0 +1,147 @@
+\usepackage{mdframed}
+\usepackage{xcolor}
+
+
+% use sans-serif font for whole document
+\renewcommand{\familydefault}{\sfdefault}
+\reversemarginpar
+
+% TITLE FORMAT =======================================
+\definesongtitletemplate{minimal}{
+
+    \mdframed[]
+    \LARGE\songproperty{title}
+    \vspace{0.5em}\\
+    \normalsize
+    \ifsongproperty{composer}
+    {%
+        \raggedleft
+        \textit{\printsongpropertylist{composer}{ \& }{, }{ \& }}\\
+        \raggedright
+    }
+    {}%
+    %\hline
+    \endmdframed
+
+    \setlength{\parindent}{0em}
+
+    \ifsongproperty{capo}
+    {
+        \textbf{Capo \songproperty{capo}}%
+    }
+    {}
+
+}
+
+% VERSE TYPE TEMPLATES ================================
+% Intro template
+\defineversetypetemplate{Intro}{
+    \vspace{0.5em}
+    \textbf{Intro: }
+}{
+    \vspace{1em}
+}
+
+
+% Verse template
+\defineversetypetemplate{Verse}{
+    \setlength{\parindent}{0em}
+}{}
+
+
+% Chorus template
+\defineversetypetemplate{Chorus}{
+
+    \mdframed[
+        %innertopmargin=10pt,
+        frametitleaboveskip=-\ht\strutbox,
+        frametitlealignment=\raggedright,
+        %
+        rightline=false,
+        leftline=true,
+        bottomline=false,
+        topline=false,
+        %
+        linecolor=gray,
+        ]
+
+    \llap{\color{gray} \rotatebox{45}{\textbf{Chorus}} \color{black}\hspace{1.5em}}%
+    \vspace*{-3em}
+}{
+    \vspace*{-1\baselineskip}
+    \endmdframed
+    \vspace{0.5em} %because option 'skipbelow' of mdframed doesn't seem to be working properly here
+}
+
+
+% Bridge template
+\defineversetypetemplate{Bridge}{
+
+
+    \mdframed[
+        %innertopmargin=10pt,
+        frametitleaboveskip=-\ht\strutbox,
+        frametitlealignment=\raggedright,
+        %
+        rightline=false,
+        leftline=true,
+        bottomline=false,
+        topline=false,
+        %
+        linecolor=gray,
+        ]
+
+    \llap{\color{gray} \rotatebox{45}{\textbf{Bridge}} \color{black}\hspace{1.5em}}%
+    \vspace*{-4em}
+}{
+    \vspace*{-0.5\baselineskip}
+    \endmdframed
+    \vspace{0.5em} %because option 'skipbelow' of mdframed doesn't seem to be working properly here
+}
+
+
+% Solo template
+\defineversetypetemplate{Solo}{
+    \vspace{3em}
+    \textbf{Solo :}
+}{
+    \vspace{2.5em}
+}
+
+
+% Outro template
+\defineversetypetemplate{Outro}{
+    \vspace{2em}
+    \textbf{Outro :}
+}{
+    \vspace{2.5em}
+}
+
+
+
+\newversetype*{Intro}[template=Intro]
+\newversetype*{Verse}[template=Verse]
+\newversetype*{Chorus}[template=Chorus]
+\newversetype*{Bridge}[template=Bridge]
+\newversetype*{Solo}[template=Solo]
+\newversetype*{Outro}[template=Outro]
+
+
+\setchords{
+    format = {\bfseries}
+}
+
+
+\setleadsheets{
+    %smash-chords = true,
+    %smash-next-chord = true,
+    %print-chords = false,
+    %song-format=\sffamily,
+    capo-nr-format = arabic,
+    verse/numbered = false,
+    verse/format = \flushleft,
+    align-chords = {l},
+    remember-chords = true,
+    transpose-capo = true,
+    title-template = minimal
+}
