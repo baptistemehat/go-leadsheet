@@ -4,7 +4,7 @@ set -e
 source_file=$1
 
 BASE_DIR=$(dirname "$0")
-LATEX_DIR=$BASE_DIR/latex
+LATEX_DIR=$BASE_DIR/../latex
 
 LATEX_TMP_DIR=$LATEX_DIR/tmp
 LATEX_SONGS_DIR=$LATEX_TMP_DIR/songs
