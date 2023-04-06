@@ -42,13 +42,21 @@ func (restApi *RestApi) ListenAndServe(addr string) {
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
 
-// ENDPOINTS
+// **********************
+//      ENDPOINTS
+// **********************
+
 // health
 func (ri *RestApi) health(w http.ResponseWriter, r *http.Request) {
+
 	log.Printf("Received API request: health")
+
 	switch r.Method {
+
+	// GET
 	case http.MethodGet:
 		httpResponse.SendResponse(w, "ok")
+
 	default:
 		httpResponse.MethodNotAllowed(w)
 	}
@@ -59,32 +67,54 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Received API request: song")
 
-	type Msg struct {
-		Source string `json:"source"`
-	}
-
-	msg := &Msg{}
-
 	switch r.Method {
+
+	// GET
 	case http.MethodGet:
+
 		switch restApi.pdfGenerator.Status() {
+
 		case pdfGenerator.StatusDone:
 			httpResponse.ServeFile(w, r, restApi.pdfGenerator.Output())
+
 		default:
 			httpResponse.BadRequest(w)
 		}
 		return
+
+	// POST
 	case http.MethodPost:
 
-		err := json.NewDecoder(r.Body).Decode(&msg)
-		if err != nil {
+		intputType := r.URL.Query().Get("type")
+
+		switch intputType {
+		case "text":
+
+			// TODO : create a Schema in a json file ? Shared file with UI
+			type Msg struct {
+				Title     string `json:"title"`
+				Composer  string `json:"composer"`
+				Leadsheet string `json:"leadsheet"`
+			}
+
+			msg := &Msg{}
+
+			err := json.NewDecoder(r.Body).Decode(&msg)
+			if err != nil {
+				httpResponse.BadRequest(w)
+				return
+			}
+
+			go restApi.pdfGenerator.GeneratePdfFromBuffer(msg.Leadsheet)
+			httpResponse.Accepted(w)
+
+		case "file":
+			// TODO : handle file upload
+
+		default:
 			httpResponse.BadRequest(w)
 			return
 		}
-
-		// TODO : make GeneratePdf start goroutines so that we won't need to use defer statements
-		defer restApi.pdfGenerator.GeneratePdf(msg.Source)
-		httpResponse.Accepted(w)
 
 	default:
 		httpResponse.MethodNotAllowed(w)
@@ -97,6 +127,8 @@ func (restApi *RestApi) status(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received API request: status")
 
 	switch r.Method {
+
+	// GET
 	case http.MethodGet:
 
 		status := restApi.pdfGenerator.Status()
