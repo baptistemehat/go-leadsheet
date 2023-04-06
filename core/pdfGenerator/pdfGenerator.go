@@ -2,7 +2,9 @@ package pdfGenerator
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
+	"time"
 )
 
 // Generation status
@@ -30,28 +32,44 @@ func (s Status) String() string {
 	}
 }
 
+// PdfGenerator
 type PdfGenerator struct {
-	status Status
-	output string
+	status     Status
+	outputFile string
 }
 
 func NewPdfGenerator() (*PdfGenerator, error) {
 	p := &PdfGenerator{
-		status: StatusNotStarted,
-		output: "latex/tmp/out/main.pdf",
+		status:     StatusNotStarted,
+		outputFile: "latex/tmp/out/main.pdf",
 	}
 	return p, nil
+}
+
+// GeneratePdfFromBuffer generates a pdf leadsheet from a string buffer
+func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
+
+	sourceFile := "latex/tmp/leadsheet.txt.tmp"
+
+	f, err := os.Create(sourceFile)
+	if err != nil {
+		return err
+	}
+
+	defer os.Remove(sourceFile)
+
+	f.WriteString(buffer)
+	f.Close()
+
+	return pg.GeneratePdf(sourceFile)
 }
 
 // GeneratePdf generates a pdf song file from a raw text source file
 func (pg *PdfGenerator) GeneratePdf(source string) error {
 
-	// TODO : launch goroutines and use channels to return error messages
-	// so that GeneratePdf returns instantly
-
-	// TODO : use mutexes to handle status
-
 	pg.status = StatusInProgress
+
+	time.Sleep(10 * time.Second)
 
 	err := pg.txt2tex(source)
 	if err != nil {
@@ -76,7 +94,7 @@ func (pg PdfGenerator) Status() Status {
 
 // Output returns path to the generated pdf file
 func (pg PdfGenerator) Output() string {
-	return pg.output
+	return pg.outputFile
 }
 
 // txt2tex "transpiles" input raw text files into leadsheet LateX files
