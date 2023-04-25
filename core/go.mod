@@ -1,4 +1,4 @@
-module core
+module github.com/baptistemehat/go-leadsheet/core
 
 go 1.19
 

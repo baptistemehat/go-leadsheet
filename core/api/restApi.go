@@ -1,11 +1,12 @@
 package api
 
 import (
-	"core/httpResponse"
-	"core/pdfGenerator"
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/baptistemehat/go-leadsheet/core/httpResponse"
+	"github.com/baptistemehat/go-leadsheet/core/pdfGenerator"
 
 	"github.com/gorilla/mux"
 )

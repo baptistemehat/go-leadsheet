@@ -1,9 +1,10 @@
 package main
 
 import (
-	"core/api"
-	"core/pdfGenerator"
 	"log"
+
+	"github.com/baptistemehat/go-leadsheet/core/api"
+	"github.com/baptistemehat/go-leadsheet/core/pdfGenerator"
 )
 
 type App struct {
