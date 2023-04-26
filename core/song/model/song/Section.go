@@ -25,6 +25,6 @@ func (section *Section) Clear() {
 	section.Lines = []Line{}
 }
 
-// func (section *Section) Format(f songFormatter.SongFormatter) string {
-// 	return f.FormatSection(section)
-// }
+func (section *Section) Format(f SongFormatter) (string, error) {
+	return f.FormatSection(section)
+}

@@ -7,33 +7,23 @@ import (
 type DefaultSongFormatter struct {
 }
 
-func (f *DefaultSongFormatter) FormatChord(chord *song.Chord) string {
-	// result := chord.Root.String()
+func (f *DefaultSongFormatter) FormatChord(chord *song.Chord) (string, error) {
 
-	// result += chord.ChordType.String()
-
-	// // TODO : handle extensions, 9, 11, add9, 6/9
-
-	// if chord.BassNote != chord.Root {
-	// 	result += "/" + chord.BassNote.String()
-	// }
-
-	// return result
-	return ""
+	return chord.String()
 }
 
-func (f *DefaultSongFormatter) FormatLine(line *song.Line) string {
-	return ""
+func (f *DefaultSongFormatter) FormatLine(line *song.Line) (string, error) {
+	return "", nil
 }
 
-func (f *DefaultSongFormatter) FormatSection(section *song.Section) string {
-	return ""
+func (f *DefaultSongFormatter) FormatSection(section *song.Section) (string, error) {
+	return "", nil
 }
 
-func (f *DefaultSongFormatter) FormatSongProperties(songProperties *song.SongProperties) string {
-	return ""
+func (f *DefaultSongFormatter) FormatSongProperties(songProperties *song.SongProperties) (string, error) {
+	return "", nil
 }
 
-func (f *DefaultSongFormatter) FormatSong(song *song.Song) string {
-	return ""
+func (f *DefaultSongFormatter) FormatSong(song *song.Song) (string, error) {
+	return "", nil
 }

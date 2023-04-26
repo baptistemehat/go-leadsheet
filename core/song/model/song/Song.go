@@ -9,6 +9,11 @@ type SongProperties struct {
 	Title    string `json:"title"`
 	Composer string `json:"composer"`
 	Capo     int    `json:"capo"`
+	Key      string `json:"key"`
+}
+
+func (sp *SongProperties) Format(f SongFormatter) (string, error) {
+	return f.FormatSongProperties(sp)
 }
 
 func (sp *SongProperties) SetProperty(name string, value interface{}) error {
@@ -34,6 +39,12 @@ func (sp *SongProperties) SetProperty(name string, value interface{}) error {
 			return fmt.Errorf("value '%s' is not suitable for capo", value)
 		} else {
 			sp.Capo = capo
+		}
+	case "key":
+		if key, ok := value.(string); !ok {
+			return fmt.Errorf("value '%s' is not suitable for title", value)
+		} else {
+			sp.Key = key
 		}
 
 	default:
@@ -62,6 +73,6 @@ func (song *Song) SetProperties(sp SongProperties) {
 	song.Properties = sp
 }
 
-// func (song *Song) Format(f songFormatter.SongFormatter) string {
-// 	return f.FormatSong(song)
-//}
+func (song *Song) Format(f SongFormatter) (string, error) {
+	return f.FormatSong(song)
+}

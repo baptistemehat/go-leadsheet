@@ -106,7 +106,8 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			go restApi.pdfGenerator.GeneratePdfFromBuffer(msg.Leadsheet)
+			// go restApi.pdfGenerator.GeneratePdfFromBuffer(msg.Leadsheet)
+			go restApi.pdfGenerator.GeneratePdfFromBufferAlt(msg.Leadsheet)
 			httpResponse.Accepted(w)
 
 		case "file":

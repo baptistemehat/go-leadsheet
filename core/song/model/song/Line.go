@@ -64,6 +64,6 @@ func (line *Line) IsChordsOnly() bool {
 	return len(line.Chords) > 0 && len(line.Lyrics) == 0
 }
 
-// func (line *Line) Format(f songFormatter.SongFormatter) string {
-// 	return f.FormatLine(line)
-// }
+func (line *Line) Format(f SongFormatter) (string, error) {
+	return f.FormatLine(line)
+}

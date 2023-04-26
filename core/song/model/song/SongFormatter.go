@@ -1,9 +1,9 @@
 package song
 
 type SongFormatter interface {
-	FormatChord(*Chord) string
-	FormatLine(*Line) string
-	FormatSection(*Section) string
-	FormatSongProperties(*SongProperties) string
-	FormatSong(*Song) string
+	FormatChord(*Chord) (string, error)
+	FormatLine(*Line) (string, error)
+	FormatSection(*Section) (string, error)
+	FormatSongProperties(*SongProperties) (string, error)
+	FormatSong(*Song) (string, error)
 }

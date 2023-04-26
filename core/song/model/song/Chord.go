@@ -138,6 +138,6 @@ func (chord *Chord) String() (string, error) {
 	return result, nil
 }
 
-// func (c *Chord) Format(f songFormatter.SongFormatter) string {
-// 	return f.FormatChord(c)
-// }
+func (c *Chord) Format(f SongFormatter) (string, error) {
+	return f.FormatChord(c)
+}
