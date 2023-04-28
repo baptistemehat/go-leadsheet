@@ -1,19 +1,19 @@
-package songFormatter
+package formatter
 
 import (
 	"testing"
 
-	"github.com/baptistemehat/go-leadsheet/core/song/model/song"
+	"github.com/baptistemehat/go-leadsheet/core/song/model"
 )
 
 type latexTestCase struct {
-	chord    song.Chord
+	chord    model.Chord
 	expected string
 }
 
 var latexTestCases []latexTestCase = []latexTestCase{
-	{song.NewChord(song.D, song.Minor, song.SeventhNone, []uint8{}, song.D), "\\chord{Dm}"},
-	{song.NewChord(song.E, song.Major, song.MinorSeventh, []uint8{}, song.Gs), "\\chord{E7/G#}"},
+	{model.NewChord(model.D, model.Minor, model.SeventhNone, []uint8{}, model.D), "\\chord{Dm}"},
+	{model.NewChord(model.E, model.Major, model.MinorSeventh, []uint8{}, model.Gs), "\\chord{E7/G#}"},
 }
 
 func TestFormatChord(t *testing.T) {
@@ -29,11 +29,11 @@ func TestFormatChord(t *testing.T) {
 
 func TestFormatLine_LyricsOnly(t *testing.T) {
 	testCases := []struct {
-		line     song.Line
+		line     model.Line
 		expected string
 	}{
-		{song.NewLine(), ""},
-		{song.NewLine(), "Somewhere over the rainbow"},
+		{model.NewLine(), ""},
+		{model.NewLine(), "Somewhere over the rainbow"},
 	}
 
 	f := LatexSongFormatter{}
@@ -51,11 +51,11 @@ func TestFormatLine_ChordsOnly(t *testing.T) {
 
 func TestFormatLine_LyricsAndChords(t *testing.T) {
 
-	line := song.NewLine()
+	line := model.NewLine()
 	line.SetLyrics("Somewhere over the rainbow")
-	line.AddChord(song.NewChord(song.G, song.Major, song.SeventhNone, []uint8{}, song.G), 0)
-	line.AddChord(song.NewChord(song.B, song.Minor, song.SeventhNone, []uint8{}, song.B), 10)
-	line.AddChord(song.NewChord(song.C, song.Major, song.SeventhNone, []uint8{}, song.C), 25)
+	line.AddChord(model.NewChord(model.G, model.Major, model.SeventhNone, []uint8{}, model.G), 0)
+	line.AddChord(model.NewChord(model.B, model.Minor, model.SeventhNone, []uint8{}, model.B), 10)
+	line.AddChord(model.NewChord(model.C, model.Major, model.SeventhNone, []uint8{}, model.C), 25)
 
 	expectedString := "\\chord{G}Somewhere \\chord{Bm}over the rainbo\\chord{C}w \\\\"
 
@@ -68,14 +68,14 @@ func TestFormatLine_LyricsAndChords(t *testing.T) {
 
 func TestFormatSection(t *testing.T) {
 
-	section := song.NewSection()
+	section := model.NewSection()
 	section.SetName("Verse")
 
-	line := song.NewLine()
+	line := model.NewLine()
 	line.SetLyrics("Somewhere over the rainbow")
-	line.AddChord(song.NewChord(song.G, song.Major, song.SeventhNone, []uint8{}, song.G), 0)
-	line.AddChord(song.NewChord(song.B, song.Minor, song.SeventhNone, []uint8{}, song.B), 10)
-	line.AddChord(song.NewChord(song.C, song.Major, song.SeventhNone, []uint8{}, song.C), 25)
+	line.AddChord(model.NewChord(model.G, model.Major, model.SeventhNone, []uint8{}, model.G), 0)
+	line.AddChord(model.NewChord(model.B, model.Minor, model.SeventhNone, []uint8{}, model.B), 10)
+	line.AddChord(model.NewChord(model.C, model.Major, model.SeventhNone, []uint8{}, model.C), 25)
 
 	section.AddLine(line)
 
@@ -95,9 +95,9 @@ func TestFormatSongProperties(t *testing.T) {
 }
 
 func TestFormatSong(t *testing.T) {
-	s := song.NewSong()
+	s := model.NewSong()
 
-	songProperties := song.SongProperties{
+	songProperties := model.SongProperties{
 		Title:    "Somewhere over the rainbow",
 		Composer: "Israel Kamakawiwo'ole",
 		Capo:     0,
@@ -105,14 +105,14 @@ func TestFormatSong(t *testing.T) {
 
 	s.SetProperties(songProperties)
 
-	section := song.NewSection()
+	section := model.NewSection()
 	section.SetName("Verse")
 
-	line := song.NewLine()
+	line := model.NewLine()
 	line.SetLyrics("Somewhere over the rainbow")
-	line.AddChord(song.NewChord(song.G, song.Major, song.SeventhNone, []uint8{}, song.G), 0)
-	line.AddChord(song.NewChord(song.B, song.Minor, song.SeventhNone, []uint8{}, song.B), 10)
-	line.AddChord(song.NewChord(song.C, song.Major, song.SeventhNone, []uint8{}, song.C), 25)
+	line.AddChord(model.NewChord(model.G, model.Major, model.SeventhNone, []uint8{}, model.G), 0)
+	line.AddChord(model.NewChord(model.B, model.Minor, model.SeventhNone, []uint8{}, model.B), 10)
+	line.AddChord(model.NewChord(model.C, model.Major, model.SeventhNone, []uint8{}, model.C), 25)
 
 	section.AddLine(line)
 	s.AddSection(section)

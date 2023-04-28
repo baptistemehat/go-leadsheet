@@ -1,4 +1,4 @@
-package song
+package model
 
 type ChordIndex struct {
 	Index uint8 `json:"index"`
@@ -64,6 +64,6 @@ func (line *Line) IsChordsOnly() bool {
 	return len(line.Chords) > 0 && len(line.Lyrics) == 0
 }
 
-func (line *Line) Format(f SongFormatter) (string, error) {
+func (line *Line) Format(f Formatter) (string, error) {
 	return f.FormatLine(line)
 }

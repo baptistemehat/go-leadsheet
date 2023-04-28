@@ -1,4 +1,4 @@
-package song
+package model
 
 import (
 	"encoding/json"
@@ -138,6 +138,6 @@ func (chord *Chord) String() (string, error) {
 	return result, nil
 }
 
-func (c *Chord) Format(f SongFormatter) (string, error) {
+func (c *Chord) Format(f Formatter) (string, error) {
 	return f.FormatChord(c)
 }

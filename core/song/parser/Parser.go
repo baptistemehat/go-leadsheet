@@ -7,30 +7,34 @@ import (
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexer"
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexer/lexingFunctions"
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
-	"github.com/baptistemehat/go-leadsheet/core/song/model/song"
+	"github.com/baptistemehat/go-leadsheet/core/song/model"
 )
 
 type DefaultScheme struct {
 }
 
-type Parser struct {
+type Parser interface {
+	Parse(string) (model.Song, error)
+}
+
+type InlineChordParser struct {
 	Scheme DefaultScheme
 }
 
-func (p *Parser) Parse(input string) (song.Song, error) {
-	s := song.NewSong()
+func (p InlineChordParser) Parse(input string) (model.Song, error) {
+	s := model.NewSong()
 
 	var token lexertoken.Token
 	var tokenValue string
 
 	l := lexer.NewLexer(input, lexingFunctions.LexRoot)
 
-	section := song.NewSection()
-	line := song.NewLine()
+	section := model.NewSection()
+	line := model.NewLine()
 	propertyKey := ""
 	lyrics := ""
 
-	var ch song.Chord
+	var ch model.Chord
 	var error error
 
 	for {
@@ -86,8 +90,8 @@ func (p *Parser) Parse(input string) (song.Song, error) {
 
 		case lexertoken.TOKEN_CHORD:
 
-			if ch, error = song.ParseChord(tokenValue); error != nil {
-				return song.Song{}, fmt.Errorf("illegal chord format : %s", tokenValue)
+			if ch, error = model.ParseChord(tokenValue); error != nil {
+				return model.Song{}, fmt.Errorf("illegal chord format : %s", tokenValue)
 			}
 
 			line.AddChord(ch, uint8(len(lyrics)))

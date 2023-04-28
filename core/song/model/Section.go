@@ -1,4 +1,4 @@
-package song
+package model
 
 type Section struct {
 	Name  string `json:"name"`
@@ -25,6 +25,6 @@ func (section *Section) Clear() {
 	section.Lines = []Line{}
 }
 
-func (section *Section) Format(f SongFormatter) (string, error) {
+func (section *Section) Format(f Formatter) (string, error) {
 	return f.FormatSection(section)
 }

@@ -5,6 +5,8 @@ import (
 
 	"github.com/baptistemehat/go-leadsheet/core/api"
 	"github.com/baptistemehat/go-leadsheet/core/pdfGenerator"
+	songFormatter "github.com/baptistemehat/go-leadsheet/core/song/formatter"
+	"github.com/baptistemehat/go-leadsheet/core/song/parser"
 )
 
 type App struct {
@@ -13,7 +15,14 @@ type App struct {
 
 func NewApp() (*App, error) {
 
-	pdfGenerator, err := pdfGenerator.NewPdfGenerator()
+	// a builder defines the parser and formatter to use
+	builder := pdfGenerator.Builder{
+		Parser:    parser.InlineChordParser{},
+		Formatter: &songFormatter.LatexSongFormatter{},
+	}
+
+	// create pdf generator
+	pdfGenerator, err := pdfGenerator.NewPdfGenerator(builder)
 	if err != nil {
 		return nil, err
 	}

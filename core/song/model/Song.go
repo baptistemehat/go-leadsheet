@@ -1,4 +1,4 @@
-package song
+package model
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ type SongProperties struct {
 	Key      string `json:"key"`
 }
 
-func (sp *SongProperties) Format(f SongFormatter) (string, error) {
+func (sp *SongProperties) Format(f Formatter) (string, error) {
 	return f.FormatSongProperties(sp)
 }
 
@@ -73,6 +73,6 @@ func (song *Song) SetProperties(sp SongProperties) {
 	song.Properties = sp
 }
 
-func (song *Song) Format(f SongFormatter) (string, error) {
+func (song *Song) Format(f Formatter) (string, error) {
 	return f.FormatSong(song)
 }

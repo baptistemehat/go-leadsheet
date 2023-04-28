@@ -8,7 +8,7 @@ import (
 
 func TestParseInlineChord(t *testing.T) {
 
-	p := Parser{}
+	p := InlineChordParser{}
 
 	song, err := p.Parse(`
 
@@ -46,7 +46,7 @@ Any [Dm]time of year, (any time of year) You can [E7]find it here
 }
 
 func TestParseeChordLine(t *testing.T) {
-	p := Parser{}
+	p := InlineChordParser{}
 
 	song, err := p.Parse(`
 

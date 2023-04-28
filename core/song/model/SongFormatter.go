@@ -1,6 +1,6 @@
-package song
+package model
 
-type SongFormatter interface {
+type Formatter interface {
 	FormatChord(*Chord) (string, error)
 	FormatLine(*Line) (string, error)
 	FormatSection(*Section) (string, error)

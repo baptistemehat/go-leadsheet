@@ -1,15 +1,15 @@
-package songFormatter
+package formatter
 
 import (
 	"fmt"
 
-	"github.com/baptistemehat/go-leadsheet/core/song/model/song"
+	"github.com/baptistemehat/go-leadsheet/core/song/model"
 )
 
 type LatexSongFormatter struct {
 }
 
-func (f *LatexSongFormatter) FormatChord(chord *song.Chord) (string, error) {
+func (f *LatexSongFormatter) FormatChord(chord *model.Chord) (string, error) {
 	// in leadsheet package, "^{}" can replace "\chord{}"
 	if chordString, err := chord.String(); err != nil {
 		return "", err
@@ -18,7 +18,7 @@ func (f *LatexSongFormatter) FormatChord(chord *song.Chord) (string, error) {
 	}
 }
 
-func (f *LatexSongFormatter) FormatLine(line *song.Line) (string, error) {
+func (f *LatexSongFormatter) FormatLine(line *model.Line) (string, error) {
 
 	result := line.Lyrics
 
@@ -35,7 +35,7 @@ func (f *LatexSongFormatter) FormatLine(line *song.Line) (string, error) {
 	return result, nil
 }
 
-func (f *LatexSongFormatter) FormatSection(section *song.Section) (string, error) {
+func (f *LatexSongFormatter) FormatSection(section *model.Section) (string, error) {
 
 	result := fmt.Sprintf("\\begin{%s}\n", section.Name)
 	for _, line := range section.Lines {
@@ -47,7 +47,7 @@ func (f *LatexSongFormatter) FormatSection(section *song.Section) (string, error
 	return result, nil
 }
 
-func (f *LatexSongFormatter) FormatSongProperties(sp *song.SongProperties) (string, error) {
+func (f *LatexSongFormatter) FormatSongProperties(sp *model.SongProperties) (string, error) {
 
 	result := "{\n"
 	result += fmt.Sprintf("title = {%s},\n", sp.Title)
@@ -59,7 +59,7 @@ func (f *LatexSongFormatter) FormatSongProperties(sp *song.SongProperties) (stri
 	return result, nil
 }
 
-func (f *LatexSongFormatter) FormatSong(song *song.Song) (string, error) {
+func (f *LatexSongFormatter) FormatSong(song *model.Song) (string, error) {
 
 	result := "\\begin{song}\n"
 	songString, _ := song.Properties.Format(f)
