@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// TODO : replace by an actual key-value pair ? (string, string)
 type SongProperties struct {
 	Title    string `json:"title"`
 	Composer string `json:"composer"`
@@ -12,10 +13,13 @@ type SongProperties struct {
 	Key      string `json:"key"`
 }
 
+// Format
 func (sp *SongProperties) Format(f Formatter) (string, error) {
 	return f.FormatSongProperties(sp)
 }
 
+// SetProperty
+// temporary implementation
 func (sp *SongProperties) SetProperty(name string, value interface{}) error {
 	nameToLower := strings.ToLower(name)
 
@@ -53,11 +57,13 @@ func (sp *SongProperties) SetProperty(name string, value interface{}) error {
 	return nil
 }
 
+// Song
 type Song struct {
 	Properties SongProperties `json:"properties"`
 	Sections   []Section      `json:"sections"`
 }
 
+// NewSong
 func NewSong() Song {
 	return Song{
 		Properties: SongProperties{},
@@ -65,14 +71,17 @@ func NewSong() Song {
 	}
 }
 
+// AddSection
 func (song *Song) AddSection(section Section) {
 	song.Sections = append(song.Sections, section)
 }
 
+// SetProperies
 func (song *Song) SetProperties(sp SongProperties) {
 	song.Properties = sp
 }
 
+// Format
 func (song *Song) Format(f Formatter) (string, error) {
 	return f.FormatSong(song)
 }

@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexer"
+	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex"
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
 )
 
 type testCase struct {
 	Name          string
 	Input         string
-	LexingFunc    lexer.LexingFunction
+	LexingFunc    lex.LexingFunction
 	ExpectedToken lexertoken.Token
 }
 
@@ -58,7 +58,7 @@ func TestLexProperty(t *testing.T) {
 
 	for _, testCase := range testCaseArray {
 		t.Run(testCase.Name, func(t *testing.T) {
-			lexer := lexer.NewLexer(testCase.Input, LexRoot)
+			lexer := lex.NewLexer(testCase.Input, LexRoot)
 			testCase.LexingFunc(lexer)
 
 			if actualToken := <-lexer.Tokens; actualToken != testCase.ExpectedToken {

@@ -2,6 +2,7 @@ package model
 
 import "fmt"
 
+// Note
 type Note uint8
 
 const (
@@ -44,6 +45,7 @@ var noteToString = map[Note]string{
 	B:  "B",
 }
 
+// String
 func (note Note) String() (string, error) {
 	if result, ok := noteToString[note]; !ok {
 		return "", fmt.Errorf("illegal note: %d", note)
@@ -72,6 +74,7 @@ var stringToNote = map[string]Note{
 	"B":  B,
 }
 
+// StringToNote
 func StringToNote(note string) (Note, error) {
 
 	if result, ok := stringToNote[note]; !ok {
@@ -81,6 +84,8 @@ func StringToNote(note string) (Note, error) {
 	}
 }
 
+// Transpose
+// temporary implementation
 func (note *Note) Transponse(n int8) Note {
 	return C
 }

@@ -1,25 +1,31 @@
 package model
 
+// ChordIndex
 type ChordIndex struct {
 	Index uint8 `json:"index"`
 	Chord Chord `json:"chord"`
 }
 
+// Line
 type Line struct {
 	Chords []ChordIndex `json:"chords"`
 	Lyrics string       `json:"lyrics"`
 }
 
+// NewLine
 func NewLine() Line {
 	return Line{
 		Lyrics: "",
 	}
 }
 
-func (line *Line) SetLyrics(lyrics string) {
-	line.Lyrics = lyrics
+// AppendLyrics
+func (line *Line) AppendLyrics(lyrics string) {
+	line.Lyrics += lyrics
 }
 
+// AddChord
+// temporary implementation
 func (line *Line) AddChord(chord Chord, index uint8) {
 	line.Chords = append(line.Chords, ChordIndex{Index: index, Chord: chord})
 
@@ -51,19 +57,27 @@ func (line *Line) AddChord(chord Chord, index uint8) {
 	*/
 }
 
+// Clear
 func (line *Line) Clear() {
 	line.Chords = []ChordIndex{}
 	line.Lyrics = ""
 }
 
+// IsLyricsOnly
 func (line *Line) IsLyricsOnly() bool {
 	return len(line.Lyrics) > 0 && len(line.Chords) == 0
 }
 
+// IsChordsOnly
 func (line *Line) IsChordsOnly() bool {
 	return len(line.Chords) > 0 && len(line.Lyrics) == 0
 }
 
+func (line *Line) IsEmpty() bool {
+	return len(line.Chords) == 0 && len(line.Lyrics) == 0
+}
+
+// Format
 func (line *Line) Format(f Formatter) (string, error) {
 	return f.FormatLine(line)
 }

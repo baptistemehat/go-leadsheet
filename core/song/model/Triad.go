@@ -2,6 +2,7 @@ package model
 
 import "fmt"
 
+// Triad
 type Triad uint8
 
 const (
@@ -18,6 +19,7 @@ var triadToString = map[Triad]string{
 	Diminished: "dim",
 }
 
+// String
 func (triad Triad) String() (string, error) {
 	if result, ok := triadToString[triad]; !ok {
 		return "", fmt.Errorf("illegal triad type: %d", triad)
@@ -33,6 +35,7 @@ var stringToTriad = map[string]Triad{
 	"dim": Diminished,
 }
 
+// StringToTriad
 func StringToTriad(triad string) (Triad, error) {
 	if result, ok := stringToTriad[triad]; !ok {
 		return 0, fmt.Errorf("illegal triad type: %s", triad)

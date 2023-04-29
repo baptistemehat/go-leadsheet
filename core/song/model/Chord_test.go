@@ -29,7 +29,7 @@ func TestParseChord(t *testing.T) {
 			if actualChord, error = ParseChord(testCase.Input); error != nil {
 				t.Errorf("Error while parsing chord, %s", error)
 			}
-			if !ChordsEqual(actualChord, testCase.Expected) {
+			if !actualChord.Equal(testCase.Expected) {
 				expectedString, _ := testCase.Expected.String()
 				actualString, _ := actualChord.String()
 				t.Errorf("Expected: %s, Got: %s", expectedString, actualString)

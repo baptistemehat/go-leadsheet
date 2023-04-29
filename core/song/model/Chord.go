@@ -15,6 +15,7 @@ import (
 // Bass note : /B
 // This should work : C7b5#11sus4add9/Gb
 
+// Chord
 type Chord struct {
 	Root        Note
 	TriadType   Triad
@@ -25,6 +26,7 @@ type Chord struct {
 	BassNote    Note
 }
 
+// NewChord creates a new chord
 func NewChord(root Note, triadType Triad, seventh Seventh, extensions []uint8, bassNote Note) Chord {
 
 	return Chord{
@@ -36,7 +38,10 @@ func NewChord(root Note, triadType Triad, seventh Seventh, extensions []uint8, b
 	}
 }
 
+// ParseChord
+// temporary implementation
 func ParseChord(chordString string) (Chord, error) {
+
 	// TODO :
 	// 1. make this parsing really complete
 	// 2. create a "real" parser with tokens
@@ -45,7 +50,6 @@ func ParseChord(chordString string) (Chord, error) {
 	tokens := re.FindStringSubmatch(chordString)
 	tokens = tokens[1:]
 
-	fmt.Println(len(tokens))
 	if len(tokens) < 3 || len(tokens) > 4 {
 		return Chord{}, fmt.Errorf("illegal chord name: %s", chordString)
 	}
@@ -84,11 +88,13 @@ func ParseChord(chordString string) (Chord, error) {
 	return NewChord(root, triadType, seventhType, []uint8{}, root), nil
 }
 
-func ChordsEqual(a, b Chord) bool {
-	result := (a.Root == b.Root) && (a.TriadType == b.TriadType) && (a.BassNote == b.BassNote)
+// Equal
+// temporary implementation
+func (chord Chord) Equal(otherChord Chord) bool {
+	result := (chord.Root == otherChord.Root) && (chord.TriadType == otherChord.TriadType) && (chord.BassNote == otherChord.BassNote)
 
-	for i := range a.Extensions {
-		if a.Extensions[i] != b.Extensions[i] {
+	for i := range chord.Extensions {
+		if chord.Extensions[i] != otherChord.Extensions[i] {
 			return false
 		}
 	}
@@ -96,6 +102,7 @@ func ChordsEqual(a, b Chord) bool {
 	return result
 }
 
+// MarshalJSON
 func (chord *Chord) MarshalJSON() ([]byte, error) {
 	if result, err := chord.String(); err != nil {
 		return []byte{}, err
@@ -105,6 +112,7 @@ func (chord *Chord) MarshalJSON() ([]byte, error) {
 	}
 }
 
+// String
 func (chord *Chord) String() (string, error) {
 	var result, root, triadType, seventhType, bassNote string
 	var err error
@@ -138,6 +146,7 @@ func (chord *Chord) String() (string, error) {
 	return result, nil
 }
 
+// Format
 func (c *Chord) Format(f Formatter) (string, error) {
 	return f.FormatChord(c)
 }

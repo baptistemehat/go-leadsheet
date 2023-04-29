@@ -15,6 +15,7 @@ func TestParseInlineChord(t *testing.T) {
 Title: Hotel California
 Composer: Eagles
 Capo: 0
+Key: Bm
 
 {Verse}
 

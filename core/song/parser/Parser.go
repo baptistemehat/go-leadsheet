@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexer"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexer/lexingFunctions"
+	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex"
+	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex/lexingFunctions"
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
 	"github.com/baptistemehat/go-leadsheet/core/song/model"
 )
@@ -13,96 +13,108 @@ import (
 type DefaultScheme struct {
 }
 
+// Parser
 type Parser interface {
 	Parse(string) (model.Song, error)
 }
 
+// InlineChordParser
 type InlineChordParser struct {
 	Scheme DefaultScheme
 }
 
+// Parse
 func (p InlineChordParser) Parse(input string) (model.Song, error) {
-	s := model.NewSong()
 
-	var token lexertoken.Token
-	var tokenValue string
+	// variables we need to keep while looping
+	var tokenValue, propertyKey string
 
-	l := lexer.NewLexer(input, lexingFunctions.LexRoot)
-
-	section := model.NewSection()
 	line := model.NewLine()
-	propertyKey := ""
-	lyrics := ""
+	section := model.NewSection()
+	song := model.NewSong()
+	lexer := lex.NewLexer(input, lexingFunctions.LexRoot)
 
-	var ch model.Chord
-	var error error
+	for terminate := false; !terminate; {
+		// lex next token
+		token := lexer.NextToken()
 
-	for {
-		token = l.NextToken()
-
+		// trim all non lyrics tokens
+		// we need to keep spaces in lyrics
 		if token.Type != lexertoken.TOKEN_LYRICS {
 			tokenValue = strings.TrimSpace(token.Value)
 		} else {
 			tokenValue = token.Value
 		}
 
-		if token.IsEOF() {
+		switch token.Type {
+
+		case lexertoken.TOKEN_EOF:
+
 			// if a section is being parsed
 			if len(section.Name) > 0 {
-				s.AddSection(section)
+
+				// stop section parsing, add section to song
+				song.AddSection(section)
 			}
-			break
-		}
 
-		switch token.Type {
+			// EOF, terminate parsing
+			terminate = true
+
 		case lexertoken.TOKEN_PROPERTY_KEY:
-
 			propertyKey = tokenValue
 
 		case lexertoken.TOKEN_PROPERTY_VALUE:
-			s.Properties.SetProperty(propertyKey, tokenValue)
+			song.Properties.SetProperty(propertyKey, tokenValue)
 			propertyKey = ""
 
 		case lexertoken.TOKEN_SECTION_NAME:
 
-			// end last section and start new
-
+			// if a section is being parsed
 			if len(section.Name) > 0 {
-				s.AddSection(section)
-				section.Clear()
+
+				// stop section parsing, add section to song
+				song.AddSection(section)
 			}
 
+			// start parsing new section
+			section.Clear()
 			section.SetName(tokenValue)
 
 		case lexertoken.TOKEN_LYRICS:
-			lyrics += tokenValue
+
+			// accumulate lyrics to produce lyrics line
+			line.AppendLyrics(tokenValue)
 
 		case lexertoken.TOKEN_NEWLINE:
 
-			// end last line and start new line
-			if len(lyrics) > 0 || len(line.Chords) > 0 {
-				line.SetLyrics(lyrics)
+			// if a line is being parsed
+			if !line.IsEmpty() {
+
+				// stop lyrics parsing, ie add lyrics to section
 				section.AddLine(line)
 			}
 
-			lyrics = ""
+			// clear line for future parsing
 			line.Clear()
 
 		case lexertoken.TOKEN_CHORD:
 
-			if ch, error = model.ParseChord(tokenValue); error != nil {
+			// parse chord
+			chord, err := model.ParseChord(tokenValue)
+			if err != nil {
 				return model.Song{}, fmt.Errorf("illegal chord format : %s", tokenValue)
 			}
 
-			line.AddChord(ch, uint8(len(lyrics)))
+			line.AddChord(chord, uint8(len(line.Lyrics)))
 
 		case lexertoken.TOKEN_LEFT_PARENTHESIS:
-			// enter "whispered" context
+			// TODO : enter "whispered" context
+
 		case lexertoken.TOKEN_RIGHT_PARENTHESIS:
-			// exit "whispered" context
+			// TODO : exit "whispered" context
 		}
 
 	}
 
-	return s, nil
+	return song, nil
 }

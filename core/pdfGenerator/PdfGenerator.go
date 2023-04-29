@@ -1,7 +1,7 @@
 package pdfGenerator
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"os/exec"
 
@@ -47,6 +47,7 @@ type PdfGenerator struct {
 	builder    Builder
 }
 
+// NewPdfGenerator create a new PdfGenerator
 func NewPdfGenerator(builder Builder) (*PdfGenerator, error) {
 	p := &PdfGenerator{
 		status:     StatusNotStarted,
@@ -71,10 +72,9 @@ func (pg PdfGenerator) Output() string {
 func (pg PdfGenerator) txt2tex(source string) error {
 	cmd := exec.Command("./pdfGenerator/scripts/txt2tex.sh", source)
 
-	out, err := cmd.Output()
+	_, err := cmd.Output()
 
 	if err != nil {
-		fmt.Println(string(out))
 		return err
 	}
 
@@ -86,11 +86,12 @@ func (pg PdfGenerator) txt2tex(source string) error {
 func (pg PdfGenerator) tex2pdf() error {
 	// TODO : add output file as argument to have coherence between pdfGenerator.Output and shell scripts
 	cmd := exec.Command("./pdfGenerator/scripts/generate-pdf.sh")
+	// for unit tests
+	// cmd := exec.Command("./scripts/generate-pdf.sh")
 
-	out, err := cmd.Output()
+	_, err := cmd.Output()
 
 	if err != nil {
-		fmt.Println(string(out))
 		return err
 	}
 
@@ -115,9 +116,13 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 
 	pg.status = StatusInProgress
 
+	// TODO : create folder if it doesn't exist
+	// TODO : these folders should be configurable
+
 	// Write input to file
-	if err := WriteStringToFile(buffer, "latex/tmp/songs/leadsheet.txt"); err != nil {
+	if err := WriteStringToFile(buffer, "./latex/tmp/leadsheet.txt"); err != nil {
 		pg.status = StatusError
+		log.Println(err)
 		return err
 	}
 
@@ -125,6 +130,7 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 	song, err := pg.builder.Parser.Parse(buffer)
 	if err != nil {
 		pg.status = StatusError
+		log.Println(err)
 		return err
 	}
 
@@ -132,18 +138,46 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 	formattedSong, err := song.Format(pg.builder.Formatter)
 	if err != nil {
 		pg.status = StatusError
+		log.Println(err)
 		return err
 	}
 
 	// Write formatted song
-	if err := WriteStringToFile(formattedSong, "latex/tmp/songs/leadsheet.tex"); err != nil {
+	if err := WriteStringToFile(formattedSong, "./latex/tmp/songs/leadsheet.tex"); err != nil {
 		pg.status = StatusError
+		log.Println(err)
 		return err
 	}
-	defer os.Remove("latex/tmp/songs/leadsheet.tex")
+	//defer os.Remove("latex/tmp/songs/leadsheet.tex")
 
 	// Compile latex
 	if err := pg.tex2pdf(); err != nil {
+		pg.status = StatusError
+		log.Println(err)
+		return err
+	}
+
+	pg.status = StatusDone
+	return nil
+}
+
+// ************************
+// GENERATE PDF WITH SCRIPT
+// ************************
+
+// GeneratePdfFromFile generates a pdf song file from a raw text source file
+func (pg *PdfGenerator) GeneratePdfFromFile(source string) error {
+
+	pg.status = StatusInProgress
+
+	err := pg.txt2tex(source)
+	if err != nil {
+		pg.status = StatusError
+		return err
+	}
+
+	err = pg.tex2pdf()
+	if err != nil {
 		pg.status = StatusError
 		return err
 	}
@@ -168,25 +202,4 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer_WithScripts(buffer string) error {
 	f.Close()
 
 	return pg.GeneratePdfFromFile(sourceFile)
-}
-
-// GeneratePdfFromFile generates a pdf song file from a raw text source file
-func (pg *PdfGenerator) GeneratePdfFromFile(source string) error {
-
-	pg.status = StatusInProgress
-
-	err := pg.txt2tex(source)
-	if err != nil {
-		pg.status = StatusError
-		return err
-	}
-
-	err = pg.tex2pdf()
-	if err != nil {
-		pg.status = StatusError
-		return err
-	}
-
-	pg.status = StatusDone
-	return nil
 }

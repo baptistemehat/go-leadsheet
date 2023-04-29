@@ -16,6 +16,8 @@ var latexTestCases []latexTestCase = []latexTestCase{
 	{model.NewChord(model.E, model.Major, model.MinorSeventh, []uint8{}, model.Gs), "\\chord{E7/G#}"},
 }
 
+// TODO : add error cases
+
 func TestFormatChord(t *testing.T) {
 
 	f := LatexSongFormatter{}

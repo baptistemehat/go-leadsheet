@@ -16,7 +16,7 @@ type RestApi struct {
 	endpoints    map[string]func(http.ResponseWriter, *http.Request)
 }
 
-// NewRestApi returns a new RestApi instance
+// NewRestApi creates a new RestApi
 func NewRestApi(p *pdfGenerator.PdfGenerator) (*RestApi, error) {
 
 	restApi := &RestApi{
@@ -24,6 +24,7 @@ func NewRestApi(p *pdfGenerator.PdfGenerator) (*RestApi, error) {
 		endpoints:    make(map[string]func(http.ResponseWriter, *http.Request)),
 	}
 
+	// define endpoints and handler functions
 	restApi.endpoints["/api/health"] = restApi.health
 	restApi.endpoints["/api/song"] = restApi.song
 	restApi.endpoints["/api/status"] = restApi.status
@@ -35,10 +36,12 @@ func NewRestApi(p *pdfGenerator.PdfGenerator) (*RestApi, error) {
 func (restApi *RestApi) ListenAndServe(addr string) {
 	r := mux.NewRouter()
 
+	// associate endpoint with handler function
 	for route, handler := range restApi.endpoints {
 		r.HandleFunc(route, handler)
 	}
 
+	// start server
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
@@ -47,10 +50,10 @@ func (restApi *RestApi) ListenAndServe(addr string) {
 //      ENDPOINTS
 // **********************
 
-// health
+// health handles /health endpoint
 func (ri *RestApi) health(w http.ResponseWriter, r *http.Request) {
 
-	log.Printf("Received API request: health")
+	log.Printf("Received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
 
 	switch r.Method {
 
@@ -63,10 +66,11 @@ func (ri *RestApi) health(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// song
+// song handles /song endpoint
 func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 
-	log.Printf("Received API request: song")
+	// TODO : find a good way to log API calls, with string reduction for query parameters
+	log.Printf("Received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
 
 	switch r.Method {
 
@@ -91,6 +95,7 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 		switch intputType {
 		case "text":
 
+			// TODO : remove this feature since metadata are passed in leadsheet
 			// TODO : create a Schema in a json file ? Shared file with UI
 			type Msg struct {
 				Title     string `json:"title"`
@@ -106,8 +111,7 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			// go restApi.pdfGenerator.GeneratePdfFromBuffer(msg.Leadsheet)
-			// go restApi.pdfGenerator.GeneratePdfFromBufferAlt(msg.Leadsheet)
+			// TODO : ? add channels to transmit error
 			go restApi.pdfGenerator.GeneratePdfFromBuffer(msg.Leadsheet)
 			httpResponse.Accepted(w)
 
@@ -124,10 +128,10 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// status
+// status handles /status endpoint
 func (restApi *RestApi) status(w http.ResponseWriter, r *http.Request) {
 
-	log.Printf("Received API request: status")
+	log.Printf("Received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
 
 	switch r.Method {
 

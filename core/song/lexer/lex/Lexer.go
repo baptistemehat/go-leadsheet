@@ -1,4 +1,4 @@
-package lexer
+package lex
 
 import (
 	"fmt"
@@ -18,6 +18,7 @@ type Lexer struct {
 	CurrentRuneWidth int
 }
 
+// NewLexer creates a new lexer
 func NewLexer(input string, lexingFunc LexingFunction) *Lexer {
 	l := &Lexer{
 		Input:              input,
@@ -28,7 +29,7 @@ func NewLexer(input string, lexingFunc LexingFunction) *Lexer {
 	return l
 }
 
-/* Inc increments lexer position */
+// Inc increments lexer position
 func (lexer *Lexer) Inc() {
 
 	// increment position
@@ -40,13 +41,13 @@ func (lexer *Lexer) Inc() {
 	}
 }
 
-/* Dec decrements lexer position */
+// Dec decrements lexer position
 func (lexer *Lexer) Dec() {
 	// decrement position
 	lexer.Position--
 }
 
-/* NextRune moves position to next rune in input and returns it */
+// NextRune moves position to next rune in input and returns it
 func (lexer *Lexer) NextRune() rune {
 
 	// if position reached last rune of input
@@ -63,13 +64,13 @@ func (lexer *Lexer) NextRune() rune {
 	return nextRune
 }
 
-/* PushToken pushes a token into the token channel */
+// PushToken pushes a token into the token channel
 func (lexer *Lexer) PushToken(tokenType lexertoken.TokenType) {
 	lexer.Tokens <- lexertoken.Token{Type: tokenType, Value: lexer.Input[lexer.Start:lexer.Position]}
 	lexer.Start = lexer.Position
 }
 
-/* NextToken procedes lexing until a token is produced and returns it */
+// NextToken procedes lexing until a token is produced and returns it
 func (lexer *Lexer) NextToken() lexertoken.Token {
 	for {
 		select {
@@ -83,7 +84,7 @@ func (lexer *Lexer) NextToken() lexertoken.Token {
 	}
 }
 
-/*  */
+// Errorf
 func (lexer *Lexer) Errorf(format string, args ...interface{}) LexingFunction {
 	lexer.Tokens <- lexertoken.Token{
 		Type:  lexertoken.TOKEN_ERROR,
@@ -93,35 +94,17 @@ func (lexer *Lexer) Errorf(format string, args ...interface{}) LexingFunction {
 	return nil
 }
 
-func (lexer *Lexer) InputToEnd() string {
-	return lexer.Input[lexer.Position:]
-}
-
+// IsEOF
 func (lexer *Lexer) IsEOF() bool {
 	return lexer.Position >= len(lexer.Input)
 }
 
+// SkipWhitespace
 func (lexer *Lexer) SkipWhitespace() {
 	for {
 		r := lexer.NextRune()
 
 		if !unicode.IsSpace(r) {
-			lexer.Dec()
-			break
-		}
-
-		if r == lexertoken.EOF {
-			lexer.PushToken(lexertoken.TOKEN_EOF)
-			return
-		}
-	}
-}
-
-func (lexer *Lexer) SkipNonNewLineWhitespace() {
-	for {
-		r := lexer.NextRune()
-
-		if !unicode.IsSpace(r) || r == '\n' || r == '\r' {
 			lexer.Dec()
 			break
 		}
