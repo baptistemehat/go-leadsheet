@@ -7,14 +7,14 @@ import (
 
 // LexLeftBrace
 func LexLeftBrace(lexer *lex.Lexer) lex.LexingFunction {
-	lexer.Position += len(lexertoken.LEFT_BRACE)
+	lexer.Position += uint(len(lexertoken.LEFT_BRACE))
 	lexer.PushToken(lexertoken.TOKEN_LEFT_BRACE)
 	return LexSectionName
 }
 
 // LexRightBrace
 func LexRightBrace(lexer *lex.Lexer) lex.LexingFunction {
-	lexer.Position += len(lexertoken.RIGHT_BRACE)
+	lexer.Position += uint(len(lexertoken.RIGHT_BRACE))
 	lexer.PushToken(lexertoken.TOKEN_RIGHT_BRACE)
 	return LexSection
 }

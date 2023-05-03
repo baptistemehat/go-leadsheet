@@ -13,9 +13,9 @@ type Lexer struct {
 	Tokens             chan lexertoken.Token
 	NextLexingFunction LexingFunction
 
-	Start            int
-	Position         int
-	CurrentRuneWidth int
+	Start            uint
+	Position         uint
+	CurrentRuneWidth uint
 }
 
 // NewLexer creates a new lexer
@@ -23,20 +23,21 @@ func NewLexer(input string, lexingFunc LexingFunction) *Lexer {
 	l := &Lexer{
 		Input:              input,
 		NextLexingFunction: lexingFunc,
-		Tokens:             make(chan lexertoken.Token, 3),
+		Tokens:             make(chan lexertoken.Token, 5),
+		// TODO : evaluate the size needed for Tokens
 	}
 
 	return l
 }
 
 // Inc increments lexer position
+// if EOF is reached, pushes EOF token
 func (lexer *Lexer) Inc() {
 
-	// increment position
 	lexer.Position++
 
 	// if position reached last rune of input
-	if lexer.Position >= utf8.RuneCountInString(lexer.Input) {
+	if lexer.Position >= (uint)(utf8.RuneCountInString(lexer.Input)) {
 		lexer.PushToken(lexertoken.TOKEN_EOF)
 	}
 }
@@ -51,22 +52,36 @@ func (lexer *Lexer) Dec() {
 func (lexer *Lexer) NextRune() rune {
 
 	// if position reached last rune of input
-	if lexer.Position >= utf8.RuneCountInString(lexer.Input) {
+	if lexer.Position >= (uint)(utf8.RuneCountInString(lexer.Input)) {
 		lexer.CurrentRuneWidth = 0
 		return lexertoken.EOF
 	}
 
 	// get next rune in input
 	nextRune, width := utf8.DecodeRuneInString(lexer.Input[lexer.Position:])
-	lexer.CurrentRuneWidth = width
-	lexer.Position += width
+	lexer.CurrentRuneWidth = uint(width)
+	lexer.Position += uint(width)
 
 	return nextRune
 }
 
 // PushToken pushes a token into the token channel
 func (lexer *Lexer) PushToken(tokenType lexertoken.TokenType) {
-	lexer.Tokens <- lexertoken.Token{Type: tokenType, Value: lexer.Input[lexer.Start:lexer.Position]}
+
+	if lexer.Start > uint(len(lexer.Input)) {
+		lexer.Errorf("lexer.Start exceeds len(lexer.Input)")
+		return
+	}
+
+	if lexer.Position > uint(len(lexer.Input)) {
+		lexer.Errorf("lexer.Position exceeds len(lexer.Input)")
+		return
+	}
+
+	lexer.Tokens <- lexertoken.Token{
+		Type:  tokenType,
+		Value: lexer.Input[lexer.Start:lexer.Position],
+	}
 	lexer.Start = lexer.Position
 }
 
@@ -96,7 +111,7 @@ func (lexer *Lexer) Errorf(format string, args ...interface{}) LexingFunction {
 
 // IsEOF
 func (lexer *Lexer) IsEOF() bool {
-	return lexer.Position >= len(lexer.Input)
+	return lexer.Position >= uint(len(lexer.Input))
 }
 
 // SkipWhitespace
