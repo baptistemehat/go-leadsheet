@@ -21,3 +21,29 @@ const (
 	TOKEN_LYRICS
 	TOKEN_CHORD
 )
+
+var tokenTypeToString = map[TokenType]string{
+	TOKEN_ERROR:             "ERROR",
+	TOKEN_EOF:               "EOF",
+	TOKEN_LEFT_PARENTHESIS:  "LEFT_PARENTHESIS",
+	TOKEN_RIGHT_PARENTHESIS: "RIGHT_PARENTHESIS",
+	TOKEN_LEFT_BRACKET:      "LEFT_BRACKET",
+	TOKEN_RIGHT_BRACKET:     "RIGHT_BRACKET",
+	TOKEN_LEFT_BRACE:        "LEFT_BRACE",
+	TOKEN_RIGHT_BRACE:       "RIGHT_BRACE",
+	TOKEN_COLUMN:            "COLUMN",
+	TOKEN_NEWLINE:           "NEWLINE",
+	TOKEN_PROPERTY_KEY:      "PROPERTY_KEY",
+	TOKEN_PROPERTY_VALUE:    "PROPERTY_VALUE",
+	TOKEN_SECTION_NAME:      "SECTION_NAME",
+	TOKEN_LYRICS:            "LYRICS",
+	TOKEN_CHORD:             "CHORD",
+}
+
+func (tokenType *TokenType) String() string {
+	if result, ok := tokenTypeToString[*tokenType]; !ok {
+		return "UNKNOWN"
+	} else {
+		return result
+	}
+}

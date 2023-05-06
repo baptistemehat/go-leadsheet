@@ -1,10 +1,7 @@
 package lexingFunctions
 
 import (
-	"strings"
-
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexererrors"
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
 )
 
@@ -13,21 +10,37 @@ import (
 // LexWhisperedLyrics
 func LexWhisperedLyrics(lexer *lex.Lexer) lex.LexingFunction {
 	for {
-		// if next char is right parenthesis ")" (ie. end of whispered lyrics)
-		if strings.HasPrefix(lexer.Input[lexer.Position:], lexertoken.RIGHT_PARENTHESIS) {
+		nextRune := lexer.PeekRune()
 
-			// push lyrics token
+		switch nextRune {
+
+		case lexertoken.EOF:
+			return lexer.Errorf("")
+
+		case lexertoken.ERROR:
+			return lexer.Errorf("")
+
+		case lexertoken.RIGHT_PARENTHESIS:
 			lexer.PushToken(lexertoken.TOKEN_LYRICS)
-			// lex right parenthesis
 			return LexRightParenthesis
 		}
 
-		// else increament position
-		lexer.Inc()
+		lexer.GoToNextRune(nextRune)
+		// // if next char is right parenthesis ")" (ie. end of whispered lyrics)
+		// if strings.HasPrefix(lexer.Input[lexer.Position:], lexertoken.RIGHT_PARENTHESIS) {
 
-		// if EOF, throw error
-		if lexer.IsEOF() {
-			return lexer.Errorf(lexererrors.LEXER_ERROR_MISSING_RIGHT_PARENTHESIS)
-		}
+		// 	// push lyrics token
+		// 	lexer.PushToken(lexertoken.TOKEN_LYRICS)
+		// 	// lex right parenthesis
+		// 	return LexRightParenthesis
+		// }
+
+		// // else increament position
+		// lexer.Inc()
+
+		// // if EOF, throw error
+		// if lexer.IsEOF() {
+		// 	return lexer.Errorf(lexererrors.LEXER_ERROR_MISSING_RIGHT_PARENTHESIS)
+		// }
 	}
 }

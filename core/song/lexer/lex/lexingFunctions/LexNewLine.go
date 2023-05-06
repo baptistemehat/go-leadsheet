@@ -7,7 +7,7 @@ import (
 
 // LexNewLine
 func LexNewLine(lexer *lex.Lexer) lex.LexingFunction {
-	lexer.Position += uint(len(lexertoken.NEWLINE))
+	lexer.GoToNextRune(lexertoken.NEWLINE)
 	lexer.PushToken(lexertoken.TOKEN_NEWLINE)
 	return LexSection
 }

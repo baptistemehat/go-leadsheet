@@ -3,6 +3,7 @@ package pdfGenerator
 import (
 	"testing"
 
+	"github.com/baptistemehat/go-leadsheet/core/config"
 	"github.com/baptistemehat/go-leadsheet/core/song/formatter"
 	"github.com/baptistemehat/go-leadsheet/core/song/parser"
 )
@@ -13,8 +14,15 @@ func TestGeneratePdfFromBuffer(t *testing.T) {
 		Formatter: &formatter.LatexSongFormatter{},
 	}
 
+	path := "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/core/config/testResources/config.yaml"
+	config, err := config.LoadConfiguration(path)
+
+	if err != nil {
+		t.Error(err)
+	}
+
 	// create pdf generator
-	pdfGenerator, err := NewPdfGenerator(builder)
+	pdfGenerator, err := NewPdfGenerator(builder, *config)
 	if err != nil {
 		t.Errorf("%s", err)
 	}

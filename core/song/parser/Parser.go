@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex"
@@ -46,10 +47,15 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 			tokenValue = token.Value
 		}
 
+		log.Println(token.Type.String())
+
 		switch token.Type {
 
-		case lexertoken.TOKEN_EOF:
+		case lexertoken.TOKEN_ERROR:
+			log.Println("ERROR : " + tokenValue)
+			terminate = true
 
+		case lexertoken.TOKEN_EOF:
 			// if a section is being parsed
 			if len(section.Name) > 0 {
 

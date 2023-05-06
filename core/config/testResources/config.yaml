@@ -1,0 +1,2 @@
+folder: "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/core/latex"
+script: "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/core/pdfGenerator/scripts/generate-pdf.sh"

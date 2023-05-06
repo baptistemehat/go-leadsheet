@@ -13,9 +13,11 @@ type Lexer struct {
 	Tokens             chan lexertoken.Token
 	NextLexingFunction LexingFunction
 
-	Start            uint
-	Position         uint
-	CurrentRuneWidth uint
+	Start         int
+	NextRuneWidth int
+	// Position is index of the lexer within the Input string.
+	// Since it is used to index a string, Position counts in bytes, not runes
+	Position int
 }
 
 // NewLexer creates a new lexer
@@ -30,37 +32,56 @@ func NewLexer(input string, lexingFunc LexingFunction) *Lexer {
 	return l
 }
 
-// Inc increments lexer position
-// if EOF is reached, pushes EOF token
-func (lexer *Lexer) Inc() {
+// Inc increments lexer position.
+// If EOF is reached, pushes EOF token.
+// func (lexer *Lexer) Inc() {
 
-	lexer.Position++
+// 	lexer.Position++
 
-	// if position reached last rune of input
-	if lexer.Position >= (uint)(utf8.RuneCountInString(lexer.Input)) {
-		lexer.PushToken(lexertoken.TOKEN_EOF)
+// 	// if position reached last rune of input
+// 	if lexer.Position >= len(lexer.Input) {
+// 		lexer.PushToken(lexertoken.TOKEN_EOF)
+// 	}
+// }
+
+// // Dec decrements lexer position.
+// // Position is capped at 0.
+// func (lexer *Lexer) Dec() {
+// 	if lexer.Position != 0 {
+// 		lexer.Position--
+// 	}
+// }
+
+// TODO : rename ConsumeRune /
+
+// GoToNextRune moves position just after next rune
+func (lexer *Lexer) GoToNextRune(nextRune rune) {
+	switch nextRune {
+	// TODO : rename to be rune
+	case lexertoken.EOF:
+		return
+	case lexertoken.ERROR:
+		return
+	default:
+		lexer.Position += utf8.RuneLen(nextRune)
 	}
 }
 
-// Dec decrements lexer position
-func (lexer *Lexer) Dec() {
-	// decrement position
-	lexer.Position--
-}
-
-// NextRune moves position to next rune in input and returns it
-func (lexer *Lexer) NextRune() rune {
-
+// PeekRune returns the next rune in input, and updates NextRuneWidth.
+// Returns EOF if OEF is reached.
+// Returns ERROR if error occured while reading next rune.
+func (lexer *Lexer) PeekRune() rune {
 	// if position reached last rune of input
-	if lexer.Position >= (uint)(utf8.RuneCountInString(lexer.Input)) {
-		lexer.CurrentRuneWidth = 0
+	if lexer.Position >= len(lexer.Input) {
 		return lexertoken.EOF
 	}
 
 	// get next rune in input
 	nextRune, width := utf8.DecodeRuneInString(lexer.Input[lexer.Position:])
-	lexer.CurrentRuneWidth = uint(width)
-	lexer.Position += uint(width)
+	if nextRune == utf8.RuneError {
+		return lexertoken.ERROR
+	}
+	lexer.NextRuneWidth = width
 
 	return nextRune
 }
@@ -68,12 +89,12 @@ func (lexer *Lexer) NextRune() rune {
 // PushToken pushes a token into the token channel
 func (lexer *Lexer) PushToken(tokenType lexertoken.TokenType) {
 
-	if lexer.Start > uint(len(lexer.Input)) {
+	if lexer.Start > len(lexer.Input) {
 		lexer.Errorf("lexer.Start exceeds len(lexer.Input)")
 		return
 	}
 
-	if lexer.Position > uint(len(lexer.Input)) {
+	if lexer.Position > len(lexer.Input) {
 		lexer.Errorf("lexer.Position exceeds len(lexer.Input)")
 		return
 	}
@@ -106,27 +127,32 @@ func (lexer *Lexer) Errorf(format string, args ...interface{}) LexingFunction {
 		Value: fmt.Sprintf(format, args...),
 	}
 
+	// TODO : add line:column indication
+
 	return nil
 }
 
 // IsEOF
 func (lexer *Lexer) IsEOF() bool {
-	return lexer.Position >= uint(len(lexer.Input))
+	return lexer.Position >= len(lexer.Input)
 }
 
 // SkipWhitespace
 func (lexer *Lexer) SkipWhitespace() {
 	for {
-		r := lexer.NextRune()
 
-		if !unicode.IsSpace(r) {
-			lexer.Dec()
+		nextRune := lexer.PeekRune()
+
+		if !unicode.IsSpace(nextRune) {
 			break
 		}
 
-		if r == lexertoken.EOF {
+		// and here we only check lexer.IsEOF ?
+		if nextRune == lexertoken.EOF {
 			lexer.PushToken(lexertoken.TOKEN_EOF)
-			return
+			break
 		}
+
+		lexer.GoToNextRune(nextRune)
 	}
 }

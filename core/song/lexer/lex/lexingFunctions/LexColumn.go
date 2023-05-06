@@ -7,7 +7,7 @@ import (
 
 // LexColumn
 func LexColumn(lexer *lex.Lexer) lex.LexingFunction {
-	lexer.Position += uint(len(lexertoken.COLUMN))
+	lexer.GoToNextRune(lexertoken.COLUMN)
 	lexer.PushToken(lexertoken.TOKEN_COLUMN)
 	return LexPropertyValue
 }

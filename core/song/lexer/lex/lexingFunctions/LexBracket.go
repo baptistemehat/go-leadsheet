@@ -7,14 +7,14 @@ import (
 
 // LexleftBracket
 func LexLeftBracket(lexer *lex.Lexer) lex.LexingFunction {
-	lexer.Position += uint(len(lexertoken.LEFT_BRACKET))
+	lexer.GoToNextRune(lexertoken.LEFT_BRACKET)
 	lexer.PushToken(lexertoken.TOKEN_LEFT_BRACKET)
 	return LexChord
 }
 
 // LexRightBracket
 func LexRightBracket(lexer *lex.Lexer) lex.LexingFunction {
-	lexer.Position += uint(len(lexertoken.RIGHT_BRACKET))
+	lexer.GoToNextRune(lexertoken.RIGHT_BRACKET)
 	lexer.PushToken(lexertoken.TOKEN_RIGHT_BRACKET)
 	return LexSongLine
 }

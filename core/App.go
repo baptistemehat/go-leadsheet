@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/baptistemehat/go-leadsheet/core/api"
+	"github.com/baptistemehat/go-leadsheet/core/config"
 	"github.com/baptistemehat/go-leadsheet/core/pdfGenerator"
 	"github.com/baptistemehat/go-leadsheet/core/song/formatter"
 	"github.com/baptistemehat/go-leadsheet/core/song/parser"
@@ -22,8 +23,15 @@ func NewApp() (*App, error) {
 		Formatter: &formatter.LatexSongFormatter{},
 	}
 
+	path := "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/core/config/testResources/config.yaml"
+	config, err := config.LoadConfiguration(path)
+
+	if err != nil {
+		return nil, err
+	}
+
 	// create pdf generator
-	pdfGenerator, err := pdfGenerator.NewPdfGenerator(builder)
+	pdfGenerator, err := pdfGenerator.NewPdfGenerator(builder, *config)
 	if err != nil {
 		log.Fatalln(err)
 		return nil, err

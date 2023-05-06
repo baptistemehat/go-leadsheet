@@ -17,7 +17,10 @@ Composer: Eagles
 Capo: 0
 Key: Bm
 
-{Verse}
+
+    
+  
+   {Verse}
 
 [Am] On a dark desert highway,[E7] cool wind in my hair
 [G] Warm smell of colitas [D] rising up through the air
