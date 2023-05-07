@@ -21,7 +21,7 @@ func TestInc_EOF(t *testing.T) {
 
 	lexer.Inc()
 
-	assert.Equal(t, uint(1), lexer.Position, "should be equal")
+	assert.Equal(t, uint(1), lexer.PositionInBuffer, "should be equal")
 
 	select {
 	case actualToken := <-lexer.Tokens:
@@ -38,17 +38,17 @@ func TestInc_Overflow(t *testing.T) {
 
 	lexer.Inc()
 
-	assert.Equal(t, uint(1), lexer.Position, "should be equal")
+	assert.Equal(t, uint(1), lexer.PositionInBuffer, "should be equal")
 	assert.Equal(t, lexertoken.TOKEN_ERROR, (<-lexer.Tokens).Type, "should be equal")
 }
 
 func TestDec(t *testing.T) {
 	lexer := NewLexer("abcd", nil)
-	lexer.Position = 2
+	lexer.PositionInBuffer = 2
 
 	lexer.Dec()
 
-	assert.Equal(t, uint(1), lexer.Position, "should be equal")
+	assert.Equal(t, uint(1), lexer.PositionInBuffer, "should be equal")
 }
 
 func TestDec_Underflow(t *testing.T) {
@@ -56,7 +56,7 @@ func TestDec_Underflow(t *testing.T) {
 
 	lexer.Dec()
 
-	assert.Equal(t, uint(0), lexer.Position, "should be equal")
+	assert.Equal(t, uint(0), lexer.PositionInBuffer, "should be equal")
 }
 
 func TestNextRune(t *testing.T) {
@@ -68,7 +68,7 @@ func TestNextRune(t *testing.T) {
 	actualRune := lexer.NextRune()
 
 	assert.Equal(t, rune(input[0]), actualRune, "should be equal")
-	assert.Equal(t, 1, lexer.Position, "should be equal")
+	assert.Equal(t, 1, lexer.PositionInBuffer, "should be equal")
 }
 
 func TestNextRune_LongRune(t *testing.T) {
@@ -82,7 +82,7 @@ func TestNextRune_LongRune(t *testing.T) {
 	actualRune := lexer.NextRune()
 
 	assert.Equal(t, expectedRune, actualRune, "should be equal")
-	assert.Equal(t, 2, lexer.Position, "should be equal")
+	assert.Equal(t, 2, lexer.PositionInBuffer, "should be equal")
 }
 
 func TestNexRune_EOF(t *testing.T) {
@@ -94,5 +94,5 @@ func TestNexRune_EOF(t *testing.T) {
 	actualRune := lexer.NextRune()
 
 	assert.Equal(t, rune(0), actualRune, "should be equal")
-	assert.Equal(t, 2, lexer.Position, "should be equal")
+	assert.Equal(t, 2, lexer.PositionInBuffer, "should be equal")
 }

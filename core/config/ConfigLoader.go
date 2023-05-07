@@ -9,6 +9,7 @@ import (
 type Configuration struct {
 	Folder string `yaml:"folder"`
 	Script string `yaml:"script"`
+	Log    string `yaml:"log"`
 }
 
 func LoadConfiguration(configPath string) (*Configuration, error) {

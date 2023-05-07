@@ -16,10 +16,11 @@ func LexSongLine(lexer *lex.Lexer) lex.LexingFunction {
 
 		case lexertoken.EOF:
 			lexer.PushToken(lexertoken.TOKEN_EOF)
-			return lexer.Errorf("")
+			return nil
 
 		case lexertoken.ERROR:
-			return lexer.Errorf("")
+			lexer.Errorf("unexpected character found")
+			return nil
 
 		case lexertoken.NEWLINE:
 			lexer.PushToken(lexertoken.TOKEN_LYRICS)
@@ -34,51 +35,10 @@ func LexSongLine(lexer *lex.Lexer) lex.LexingFunction {
 			return LexLeftParenthesis
 
 		case lexertoken.LEFT_BRACE:
-			return lexer.Errorf(lexererrors.LEXER_ERROR_MISSING_NEWLINE_BEFORE_LEFT_BRACE)
+			lexer.Errorf(lexererrors.LEXER_ERROR_MISSING_NEWLINE_BEFORE_LEFT_BRACE)
+			return nil
 		}
 
 		lexer.GoToNextRune(nextRune)
-
-		// // if next char is new line "\n" (ie. end of lyrics line)
-		// if strings.HasPrefix(lexer.Input[lexer.Position:], lexertoken.NEWLINE) {
-
-		// 	// push lyrics token
-		// 	lexer.PushToken(lexertoken.TOKEN_LYRICS)
-		// 	// lex new line
-		// 	return LexNewLine
-
-		// 	// else if next char is left bracket "[" (ie. chord)
-		// } else if strings.HasPrefix(lexer.Input[lexer.Position:], lexertoken.LEFT_BRACKET) {
-
-		// 	// push lyrics token
-		// 	lexer.PushToken(lexertoken.TOKEN_LYRICS)
-		// 	// lex left bracket
-		// 	return LexLeftBracket
-
-		// 	// else if next char is left parenthesis "(" (ie. whispered lyrics)
-		// } else if strings.HasPrefix(lexer.Input[lexer.Position:], lexertoken.LEFT_PARENTHESIS) {
-
-		// 	// push lyrics token
-		// 	lexer.PushToken(lexertoken.TOKEN_LYRICS)
-		// 	// lex left parenthesis
-		// 	return LexLeftParenthesis
-
-		// 	// else if next char is left brace "{" (ie. start of new section)
-		// } else if strings.HasPrefix(lexer.Input[lexer.Position:], lexertoken.LEFT_BRACE) {
-
-		// 	// throw error
-		// 	return lexer.Errorf(lexererrors.LEXER_ERROR_MISSING_NEWLINE_BEFORE_LEFT_BRACE)
-		// }
-
-		// // else increment position
-		// lexer.Inc()
-
-		// // no bracket or brace or parenthesis
-
-		// // if EOF, throw error
-		// if lexer.IsEOF() {
-		// 	return lexer.Errorf(lexererrors.LEXER_ERROR_MISSING_NEWLINE_BEFORE_EOF)
-		// }
-
 	}
 }

@@ -1,9 +1,8 @@
 package main
 
 import (
-	"log"
-
 	"github.com/baptistemehat/go-leadsheet/core/api"
+	"github.com/baptistemehat/go-leadsheet/core/common/logger"
 	"github.com/baptistemehat/go-leadsheet/core/config"
 	"github.com/baptistemehat/go-leadsheet/core/pdfGenerator"
 	"github.com/baptistemehat/go-leadsheet/core/song/formatter"
@@ -33,14 +32,14 @@ func NewApp() (*App, error) {
 	// create pdf generator
 	pdfGenerator, err := pdfGenerator.NewPdfGenerator(builder, *config)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Logger.Fatal().Msgf("%s", err)
 		return nil, err
 	}
 
 	// create rest api
 	restApi, err := api.NewRestApi(pdfGenerator)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Logger.Fatal().Msgf("%s", err)
 		return nil, err
 	}
 
@@ -53,6 +52,6 @@ func NewApp() (*App, error) {
 
 func (app *App) Run() {
 	port := ":8000"
-	log.Printf("App started, listening on " + port)
+	logger.Logger.Info().Msgf("app started, listening on %s", port)
 	app.restApi.ListenAndServe(port)
 }

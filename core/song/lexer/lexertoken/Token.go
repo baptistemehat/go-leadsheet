@@ -2,10 +2,23 @@ package lexertoken
 
 import "fmt"
 
+// TODO : add line and column to lexer
+
+type TokenPosition struct {
+	Line   int
+	Column int
+}
+
+func (tokenPosition *TokenPosition) String() string {
+	return fmt.Sprintf("[%d:%d]", tokenPosition.Line, tokenPosition.Column)
+}
+
 // Token
 type Token struct {
 	Type  TokenType
 	Value string
+	Start TokenPosition
+	End   TokenPosition
 }
 
 // IsEOF
@@ -14,15 +27,11 @@ func (t Token) IsEOF() bool {
 }
 
 // String
-func (t Token) String() string {
-	switch t.Type {
+func (token Token) String() string {
+	tokenValue := token.Value
 
-	case TOKEN_EOF:
-		return "EOF"
-
-	case TOKEN_ERROR:
-		return t.Value
+	if token.Type == TOKEN_EOF {
+		tokenValue = "EOF"
 	}
-
-	return fmt.Sprintf("%q", t.Value)
+	return fmt.Sprintf("start%s end%s %s %q ", token.Start.String(), token.End.String(), token.Type.String(), tokenValue)
 }

@@ -13,10 +13,13 @@ func LexChord(lexer *lex.Lexer) lex.LexingFunction {
 		switch nextRune {
 
 		case lexertoken.EOF:
-			return lexer.Errorf("")
+			// TODO : normalise error messages
+			lexer.Errorf("unexpected EOF while parsing Chord")
+			return nil
 
 		case lexertoken.ERROR:
-			return lexer.Errorf("")
+			lexer.Errorf("unexpected character found")
+			return nil
 
 		case lexertoken.RIGHT_BRACKET:
 			lexer.PushToken(lexertoken.TOKEN_CHORD)
@@ -24,25 +27,5 @@ func LexChord(lexer *lex.Lexer) lex.LexingFunction {
 		}
 
 		lexer.GoToNextRune(nextRune)
-
-		// // if next char is right bracket "]" (ie. end of chord)
-		// if strings.HasPrefix(lexer.Input[lexer.Position:], lexertoken.RIGHT_BRACKET) {
-
-		// 	// push chord token
-		// 	lexer.PushToken(lexertoken.TOKEN_CHORD)
-
-		// 	// lex right bracket
-		// 	return LexRightBracket
-		// }
-
-		// // retur error if "non-chord" char
-
-		// // else increment position
-		// lexer.Inc()
-
-		// // if EOF, throw error
-		// if lexer.IsEOF() {
-		// 	return lexer.Errorf(lexererrors.LEXER_ERROR_MISSING_RIGHT_BRACE)
-		// }
 	}
 }

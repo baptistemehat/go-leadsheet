@@ -2,9 +2,9 @@ package parser
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
+	"github.com/baptistemehat/go-leadsheet/core/common/logger"
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex"
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex/lexingFunctions"
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
@@ -39,6 +39,8 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 		// lex next token
 		token := lexer.NextToken()
 
+		logger.Logger.Trace().Msgf("received new token: %s", token.String())
+
 		// trim all non lyrics tokens
 		// we need to keep spaces in lyrics
 		if token.Type != lexertoken.TOKEN_LYRICS {
@@ -47,12 +49,10 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 			tokenValue = token.Value
 		}
 
-		log.Println(token.Type.String())
-
 		switch token.Type {
 
 		case lexertoken.TOKEN_ERROR:
-			log.Println("ERROR : " + tokenValue)
+			logger.Logger.Error().Msgf("error while parsing input: %s", tokenValue)
 			terminate = true
 
 		case lexertoken.TOKEN_EOF:
@@ -119,7 +119,6 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 		case lexertoken.TOKEN_RIGHT_PARENTHESIS:
 			// TODO : exit "whispered" context
 		}
-
 	}
 
 	return song, nil

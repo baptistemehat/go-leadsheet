@@ -15,10 +15,13 @@ func LexWhisperedLyrics(lexer *lex.Lexer) lex.LexingFunction {
 		switch nextRune {
 
 		case lexertoken.EOF:
-			return lexer.Errorf("")
+			// TODO : normalise error messages
+			lexer.Errorf("unexpected EOF while parsing root")
+			return nil
 
 		case lexertoken.ERROR:
-			return lexer.Errorf("")
+			lexer.Errorf("unexpected character found")
+			return nil
 
 		case lexertoken.RIGHT_PARENTHESIS:
 			lexer.PushToken(lexertoken.TOKEN_LYRICS)
@@ -26,21 +29,5 @@ func LexWhisperedLyrics(lexer *lex.Lexer) lex.LexingFunction {
 		}
 
 		lexer.GoToNextRune(nextRune)
-		// // if next char is right parenthesis ")" (ie. end of whispered lyrics)
-		// if strings.HasPrefix(lexer.Input[lexer.Position:], lexertoken.RIGHT_PARENTHESIS) {
-
-		// 	// push lyrics token
-		// 	lexer.PushToken(lexertoken.TOKEN_LYRICS)
-		// 	// lex right parenthesis
-		// 	return LexRightParenthesis
-		// }
-
-		// // else increament position
-		// lexer.Inc()
-
-		// // if EOF, throw error
-		// if lexer.IsEOF() {
-		// 	return lexer.Errorf(lexererrors.LEXER_ERROR_MISSING_RIGHT_PARENTHESIS)
-		// }
 	}
 }

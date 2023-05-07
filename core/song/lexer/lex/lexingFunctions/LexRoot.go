@@ -1,10 +1,7 @@
 package lexingFunctions
 
 import (
-	"log"
-
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexererrors"
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
 )
 
@@ -15,14 +12,16 @@ func LexRoot(lexer *lex.Lexer) lex.LexingFunction {
 
 	nextRune := lexer.PeekRune()
 
-	log.Println("root nextRune : " + string(nextRune))
 	switch nextRune {
 
 	case lexertoken.EOF:
-		return lexer.Errorf(lexererrors.LEXER_ERROR_UNEXPECTED_EOF)
+		// TODO : normalise error messages
+		lexer.Errorf("unexpected EOF while parsing root ")
+		return nil
 
 	case lexertoken.ERROR:
-		return lexer.Errorf("error while parsing rune")
+		lexer.Errorf("unexpected character found")
+		return nil
 
 	case lexertoken.LEFT_BRACE:
 		return LexLeftBrace
@@ -30,16 +29,4 @@ func LexRoot(lexer *lex.Lexer) lex.LexingFunction {
 	default:
 		return LexPropertyKey
 	}
-
-	// // if next rune is left brace "{" (ie. start of section)
-	// if lexer.NextRune() == lexertoken.LEFT_BRACE {
-
-	// 	// lex brace (ie. start of section)
-	// 	return LexLeftBrace
-
-	// } else {
-
-	// 	// else lex property key
-	// 	return LexPropertyKey
-	// }
 }

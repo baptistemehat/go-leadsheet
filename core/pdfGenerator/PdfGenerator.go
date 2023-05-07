@@ -1,10 +1,10 @@
 package pdfGenerator
 
 import (
-	"log"
 	"os"
 	"os/exec"
 
+	"github.com/baptistemehat/go-leadsheet/core/common/logger"
 	"github.com/baptistemehat/go-leadsheet/core/config"
 	"github.com/baptistemehat/go-leadsheet/core/song/model"
 	"github.com/baptistemehat/go-leadsheet/core/song/parser"
@@ -111,7 +111,7 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 	// Write input to file
 	if err := WriteStringToFile(buffer, pg.config.Folder+"/leadsheet.txt"); err != nil {
 		pg.status = StatusError
-		log.Println(err)
+		logger.Logger.Info().Msgf("%s", err)
 		return err
 	}
 
@@ -119,7 +119,7 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 	song, err := pg.builder.Parser.Parse(buffer)
 	if err != nil {
 		pg.status = StatusError
-		log.Println(err)
+		logger.Logger.Info().Msgf("%s", err)
 		return err
 	}
 
@@ -127,14 +127,14 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 	formattedSong, err := song.Format(pg.builder.Formatter)
 	if err != nil {
 		pg.status = StatusError
-		log.Println(err)
+		logger.Logger.Info().Msgf("%s", err)
 		return err
 	}
 
 	// Write formatted song
 	if err := WriteStringToFile(formattedSong, pg.config.Folder+"/tmp/songs/leadsheet.tex"); err != nil {
 		pg.status = StatusError
-		log.Println(err)
+		logger.Logger.Info().Msgf("%s", err)
 		return err
 	}
 	//defer os.Remove("latex/tmp/songs/leadsheet.tex")
@@ -142,7 +142,7 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 	// Compile latex
 	if err := pg.tex2pdf(); err != nil {
 		pg.status = StatusError
-		log.Printf("tex2pdf: %s\n", err)
+		logger.Logger.Info().Msgf("tex2pdf: %s", err)
 		return err
 	}
 

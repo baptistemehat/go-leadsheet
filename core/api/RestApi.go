@@ -2,9 +2,9 @@ package api
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
+	"github.com/baptistemehat/go-leadsheet/core/common/logger"
 	"github.com/baptistemehat/go-leadsheet/core/httpResponse"
 	"github.com/baptistemehat/go-leadsheet/core/pdfGenerator"
 
@@ -43,7 +43,7 @@ func (restApi *RestApi) ListenAndServe(addr string) {
 
 	// start server
 	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	logger.Logger.Fatal().Msgf("%s", http.ListenAndServe(addr, nil))
 }
 
 // **********************
@@ -53,7 +53,7 @@ func (restApi *RestApi) ListenAndServe(addr string) {
 // health handles /health endpoint
 func (ri *RestApi) health(w http.ResponseWriter, r *http.Request) {
 
-	log.Printf("Received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
+	logger.Logger.Info().Msgf("received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
 
 	switch r.Method {
 
@@ -70,7 +70,7 @@ func (ri *RestApi) health(w http.ResponseWriter, r *http.Request) {
 func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 
 	// TODO : find a good way to log API calls, with string reduction for query parameters
-	log.Printf("Received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
+	logger.Logger.Info().Msgf("Received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
 
 	switch r.Method {
 
@@ -131,7 +131,7 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 // status handles /status endpoint
 func (restApi *RestApi) status(w http.ResponseWriter, r *http.Request) {
 
-	log.Printf("Received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
+	logger.Logger.Info().Msgf("Received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
 
 	switch r.Method {
 

@@ -1,8 +1,6 @@
 package lexingFunctions
 
 import (
-	"log"
-
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex"
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
 )
@@ -11,7 +9,6 @@ import (
 func LexSection(lexer *lex.Lexer) lex.LexingFunction {
 
 	nextRune := lexer.PeekRune()
-	log.Println("LexSection : " + string(nextRune))
 
 	switch nextRune {
 	case lexertoken.EOF:
@@ -19,7 +16,8 @@ func LexSection(lexer *lex.Lexer) lex.LexingFunction {
 		return nil
 
 	case lexertoken.ERROR:
-		return lexer.Errorf("")
+		lexer.Errorf("unexpected character found")
+		return nil
 
 	case lexertoken.LEFT_BRACE:
 		return LexLeftBrace
@@ -27,16 +25,4 @@ func LexSection(lexer *lex.Lexer) lex.LexingFunction {
 	default:
 		return LexSongLine
 	}
-
-	// // if next char is left brace "{" (ie.start of section)
-	// if strings.HasPrefix(lexer.Input[lexer.Position:], lexertoken.LEFT_BRACE) {
-
-	// 	// lex left brace (ie. start a new section)
-	// 	return LexLeftBrace
-
-	// } else {
-
-	// 	// else lex song line
-	// 	return LexSongLine
-	// }
 }
