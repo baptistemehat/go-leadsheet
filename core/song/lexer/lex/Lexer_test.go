@@ -8,91 +8,233 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInc_EOF(t *testing.T) {
+func TestNewLexer(t *testing.T) {
+	// TODO
+	NewLexer("", nil)
+}
 
-	input := "a"
+type moveAfterRuneTestCase struct {
+	name          string
+	inputRune     rune
+	expectedLexer Lexer
+}
 
-	expectedToken := lexertoken.Token{
-		Type:  lexertoken.TOKEN_EOF,
-		Value: input,
+var moveAfterRunTestCases = []moveAfterRuneTestCase{
+	{
+		name:      "one byte rune",
+		inputRune: 'a',
+		expectedLexer: Lexer{
+			Input:  "abcde",
+			Tokens: make(chan lexertoken.Token, 5),
+			status: LexerStatus{
+				// TODO : try to use a real LexingFunction
+				NextLexingFunction: nil,
+				CurrentToken: lexertoken.Token{
+					Type:  lexertoken.TOKEN_UNKNOWN,
+					Value: "",
+					Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+					End:   lexertoken.TokenPosition{Line: 0, Column: 1},
+				},
+				CurrentTokenStart: 0,
+				PositionInBuffer:  1,
+			},
+		}},
+	{
+		name:      "two byte rune",
+		inputRune: 'ä',
+		expectedLexer: Lexer{
+			Input:  "äbcde",
+			Tokens: make(chan lexertoken.Token, 5),
+			status: LexerStatus{
+				NextLexingFunction: nil,
+				CurrentToken: lexertoken.Token{
+					Type:  lexertoken.TOKEN_UNKNOWN,
+					Value: "",
+					Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+					End:   lexertoken.TokenPosition{Line: 0, Column: 1},
+				},
+				CurrentTokenStart: 0,
+				PositionInBuffer:  2,
+			},
+		}},
+	{
+		name:      "EOF rune",
+		inputRune: lexertoken.EOF,
+		expectedLexer: Lexer{
+			Input:  "",
+			Tokens: make(chan lexertoken.Token, 5),
+			status: LexerStatus{
+				NextLexingFunction: nil,
+				CurrentToken: lexertoken.Token{
+					Type:  lexertoken.TOKEN_UNKNOWN,
+					Value: "",
+					Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+					End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				},
+				CurrentTokenStart: 0,
+				PositionInBuffer:  0,
+			},
+		}},
+	{
+		name:      "ERROR rune",
+		inputRune: lexertoken.ERROR,
+		expectedLexer: Lexer{
+			Input:  "",
+			Tokens: make(chan lexertoken.Token, 5),
+			status: LexerStatus{
+				NextLexingFunction: nil,
+				CurrentToken: lexertoken.Token{
+					Type:  lexertoken.TOKEN_UNKNOWN,
+					Value: "",
+					Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+					End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				},
+				CurrentTokenStart: 0,
+				PositionInBuffer:  0,
+			},
+		}},
+}
+
+func TestMoveAfterRune(t *testing.T) {
+	for _, testCase := range moveAfterRunTestCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			lexer := NewLexer(testCase.expectedLexer.Input, testCase.expectedLexer.status.NextLexingFunction)
+
+			lexer.MoveAfterRune(testCase.inputRune)
+
+			assert.Equal(t, testCase.expectedLexer.status, lexer.status)
+		})
 	}
+}
 
-	lexer := NewLexer(input, nil)
+type peekRunTestCase struct {
+	name          string
+	expectedRune  rune
+	expectedLexer Lexer
+}
 
-	lexer.Inc()
+var peekRuneTestCases = []peekRunTestCase{
+	{
+		name:         "one byte rune",
+		expectedRune: 'c',
+		expectedLexer: Lexer{
+			Input:  "abcde",
+			Tokens: make(chan lexertoken.Token, 5),
+			status: LexerStatus{
+				// TODO : try to use a real LexingFunction
+				NextLexingFunction: nil,
+				CurrentToken: lexertoken.Token{
+					Type:  lexertoken.TOKEN_UNKNOWN,
+					Value: "ab",
+					Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+					End:   lexertoken.TokenPosition{Line: 0, Column: 2},
+				},
+				CurrentTokenStart: 0,
+				PositionInBuffer:  2,
+			},
+		}},
+	{
+		name:         "two byte rune",
+		expectedRune: 'ä',
+		expectedLexer: Lexer{
+			Input:  "äbcde",
+			Tokens: make(chan lexertoken.Token, 5),
+			status: LexerStatus{
+				// TODO : try to use a real LexingFunction
+				NextLexingFunction: nil,
+				CurrentToken: lexertoken.Token{
+					Type:  lexertoken.TOKEN_UNKNOWN,
+					Value: "",
+					Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+					End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				},
+				CurrentTokenStart: 0,
+				PositionInBuffer:  0,
+			},
+		}},
+	{
+		name:         "empty input",
+		expectedRune: lexertoken.EOF,
+		expectedLexer: Lexer{
+			Input:  "",
+			Tokens: make(chan lexertoken.Token, 5),
+			status: LexerStatus{
+				// TODO : try to use a real LexingFunction
+				NextLexingFunction: nil,
+				CurrentToken: lexertoken.Token{
+					Type:  lexertoken.TOKEN_UNKNOWN,
+					Value: "",
+					Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+					End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				},
+				CurrentTokenStart: 0,
+				PositionInBuffer:  0,
+			},
+		}},
+	{
+		name:         "EOF",
+		expectedRune: lexertoken.EOF,
+		expectedLexer: Lexer{
+			Input:  "abcde",
+			Tokens: make(chan lexertoken.Token, 5),
+			status: LexerStatus{
+				// TODO : try to use a real LexingFunction
+				NextLexingFunction: nil,
+				CurrentToken: lexertoken.Token{
+					Type:  lexertoken.TOKEN_UNKNOWN,
+					Value: "ab",
+					Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+					End:   lexertoken.TokenPosition{Line: 0, Column: 5},
+				},
+				CurrentTokenStart: 0,
+				PositionInBuffer:  5,
+			},
+		}},
+	{
+		name:         "RuneError",
+		expectedRune: lexertoken.ERROR,
+		expectedLexer: Lexer{
+			Input:  string(utf8.RuneError),
+			Tokens: make(chan lexertoken.Token, 5),
+			status: LexerStatus{
+				// TODO : try to use a real LexingFunction
+				NextLexingFunction: nil,
+				CurrentToken: lexertoken.Token{
+					Type:  lexertoken.TOKEN_UNKNOWN,
+					Value: "",
+					Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+					End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				},
+				CurrentTokenStart: 0,
+				PositionInBuffer:  0,
+			},
+		}},
+}
 
-	assert.Equal(t, uint(1), lexer.PositionInBuffer, "should be equal")
+func TestPeekRune(t *testing.T) {
+	for _, testCase := range peekRuneTestCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			lexer := testCase.expectedLexer
 
-	select {
-	case actualToken := <-lexer.Tokens:
-		assert.Equal(t, expectedToken, actualToken, "should be equal")
-	default:
-		t.Error("expected token from Tokens channel, got none")
+			actualRune := lexer.PeekRune()
+
+			assert.Equal(t, testCase.expectedRune, actualRune, "should be equal")
+		})
 	}
-
 }
 
-func TestInc_Overflow(t *testing.T) {
-
-	lexer := NewLexer("", nil)
-
-	lexer.Inc()
-
-	assert.Equal(t, uint(1), lexer.PositionInBuffer, "should be equal")
-	assert.Equal(t, lexertoken.TOKEN_ERROR, (<-lexer.Tokens).Type, "should be equal")
+func TestNextToken(t *testing.T) {
+	// TODO
 }
 
-func TestDec(t *testing.T) {
-	lexer := NewLexer("abcd", nil)
-	lexer.PositionInBuffer = 2
-
-	lexer.Dec()
-
-	assert.Equal(t, uint(1), lexer.PositionInBuffer, "should be equal")
+func TestErrorf(t *testing.T) {
+	// TODO
 }
 
-func TestDec_Underflow(t *testing.T) {
-	lexer := NewLexer("", nil)
-
-	lexer.Dec()
-
-	assert.Equal(t, uint(0), lexer.PositionInBuffer, "should be equal")
+func TestSkipWitheSpace(t *testing.T) {
+	// TODO
 }
 
-func TestNextRune(t *testing.T) {
-
-	input := "abcd"
-
-	lexer := NewLexer(input, nil)
-
-	actualRune := lexer.NextRune()
-
-	assert.Equal(t, rune(input[0]), actualRune, "should be equal")
-	assert.Equal(t, 1, lexer.PositionInBuffer, "should be equal")
-}
-
-func TestNextRune_LongRune(t *testing.T) {
-
-	input := "äbcd"
-
-	expectedRune, _ := utf8.DecodeRuneInString(input)
-
-	lexer := NewLexer(input, nil)
-
-	actualRune := lexer.NextRune()
-
-	assert.Equal(t, expectedRune, actualRune, "should be equal")
-	assert.Equal(t, 2, lexer.PositionInBuffer, "should be equal")
-}
-
-func TestNexRune_EOF(t *testing.T) {
-
-	input := ""
-
-	lexer := NewLexer(input, nil)
-
-	actualRune := lexer.NextRune()
-
-	assert.Equal(t, rune(0), actualRune, "should be equal")
-	assert.Equal(t, 2, lexer.PositionInBuffer, "should be equal")
+func TestNewLine(t *testing.T) {
+	// TODO
 }

@@ -26,6 +26,6 @@ func LexChord(lexer *lex.Lexer) lex.LexingFunction {
 			return LexRightBracket
 		}
 
-		lexer.GoToNextRune(nextRune)
+		lexer.MoveAfterRune(nextRune)
 	}
 }

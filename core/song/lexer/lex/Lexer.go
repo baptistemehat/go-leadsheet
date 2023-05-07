@@ -8,40 +8,42 @@ import (
 	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
 )
 
-type Lexer struct {
-	Input              string
-	Tokens             chan lexertoken.Token
+type LexerStatus struct {
 	NextLexingFunction LexingFunction
-
-	// CurrentTokenStart
-	currentToken      lexertoken.Token
-	currentTokenStart int
+	CurrentToken       lexertoken.Token
+	CurrentTokenStart  int
 	// positionInBuffer is index of the lexer within the Input string.
 	// Since it is used to index a string, positionInBuffer counts in bytes, not runes
-	positionInBuffer int
+	PositionInBuffer int
+}
+
+type Lexer struct {
+	Input  string
+	Tokens chan lexertoken.Token
+	status LexerStatus
 }
 
 // NewLexer creates a new lexer
 func NewLexer(input string, lexingFunc LexingFunction) *Lexer {
 	return &Lexer{
-		Input:              input,
-		Tokens:             make(chan lexertoken.Token, 5),
-		NextLexingFunction: lexingFunc,
-		// TODO : evaluate the size needed for Tokens
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_ERROR,
-			Value: "",
-			Start: lexertoken.TokenPosition{0, 0},
-			End:   lexertoken.TokenPosition{0, 0},
+		Input:  input,
+		Tokens: make(chan lexertoken.Token, 5),
+		status: LexerStatus{
+			NextLexingFunction: lexingFunc,
+			CurrentToken:       lexertoken.NewToken(),
+			CurrentTokenStart:  0,
+			PositionInBuffer:   0,
 		},
-		positionInBuffer: 0,
 	}
+}
+func (lexer *Lexer) GetPositionInBuffer() int {
+	return lexer.status.PositionInBuffer
 }
 
 // TODO : rename ConsumeRune /
 
-// GoToNextRune moves position just after next rune
-func (lexer *Lexer) GoToNextRune(nextRune rune) {
+// MoveAfterRune moves position just after next rune
+func (lexer *Lexer) MoveAfterRune(nextRune rune) {
 	switch nextRune {
 	// TODO : rename to be rune
 	case lexertoken.EOF:
@@ -49,8 +51,8 @@ func (lexer *Lexer) GoToNextRune(nextRune rune) {
 	case lexertoken.ERROR:
 		return
 	default:
-		lexer.positionInBuffer += utf8.RuneLen(nextRune)
-		lexer.currentToken.End.Column++
+		lexer.status.PositionInBuffer += utf8.RuneLen(nextRune)
+		lexer.status.CurrentToken.End.Column++
 	}
 }
 
@@ -59,12 +61,12 @@ func (lexer *Lexer) GoToNextRune(nextRune rune) {
 // Returns ERROR if error occured while reading next rune.
 func (lexer *Lexer) PeekRune() rune {
 	// if position reached last rune of input
-	if lexer.positionInBuffer >= len(lexer.Input) {
+	if lexer.status.PositionInBuffer >= len(lexer.Input) {
 		return lexertoken.EOF
 	}
 
 	// get next rune in input
-	nextRune, _ := utf8.DecodeRuneInString(lexer.Input[lexer.positionInBuffer:])
+	nextRune, _ := utf8.DecodeRuneInString(lexer.Input[lexer.status.PositionInBuffer:])
 	if nextRune == utf8.RuneError {
 		return lexertoken.ERROR
 	}
@@ -74,24 +76,24 @@ func (lexer *Lexer) PeekRune() rune {
 // PushToken pushes a token into the token channel
 func (lexer *Lexer) PushToken(tokenType lexertoken.TokenType) {
 
-	if lexer.currentTokenStart > len(lexer.Input) {
+	if lexer.status.CurrentTokenStart > len(lexer.Input) {
 		lexer.Errorf("lexer.Start exceeds len(lexer.Input)")
 		return
 	}
 
-	if lexer.positionInBuffer > len(lexer.Input) {
+	if lexer.status.PositionInBuffer > len(lexer.Input) {
 		lexer.Errorf("lexer.Position exceeds len(lexer.Input)")
 		return
 	}
 
-	lexer.currentToken.Type = tokenType
-	lexer.currentToken.Value = lexer.Input[lexer.currentTokenStart:lexer.positionInBuffer]
+	lexer.status.CurrentToken.Type = tokenType
+	lexer.status.CurrentToken.Value = lexer.Input[lexer.status.CurrentTokenStart:lexer.status.PositionInBuffer]
 
-	lexer.Tokens <- lexer.currentToken
+	lexer.Tokens <- lexer.status.CurrentToken
 
-	lexer.currentToken.Start = lexer.currentToken.End
+	lexer.status.CurrentToken.Start = lexer.status.CurrentToken.End
 
-	lexer.currentTokenStart = lexer.positionInBuffer
+	lexer.status.CurrentTokenStart = lexer.status.PositionInBuffer
 }
 
 // NextToken procedes lexing until a token is produced and returns it
@@ -104,7 +106,7 @@ func (lexer *Lexer) NextToken() lexertoken.Token {
 		// if no token to pull, resume lexing
 		default:
 			// TODO : handle nil return case
-			lexer.NextLexingFunction = lexer.NextLexingFunction(lexer)
+			lexer.status.NextLexingFunction = lexer.status.NextLexingFunction(lexer)
 		}
 	}
 }
@@ -142,15 +144,15 @@ func (lexer *Lexer) SkipWhitespace() {
 			break
 		}
 
-		lexer.GoToNextRune(nextRune)
+		lexer.MoveAfterRune(nextRune)
 	}
-	lexer.currentTokenStart = lexer.positionInBuffer
+	lexer.status.CurrentTokenStart = lexer.status.PositionInBuffer
 }
 
 // Newline
 func (lexer *Lexer) Newline() {
-	lexer.currentToken.Start.Line++
-	lexer.currentToken.Start.Column = 0
-	lexer.currentToken.End.Line++
-	lexer.currentToken.End.Column = 0
+	lexer.status.CurrentToken.Start.Line++
+	lexer.status.CurrentToken.Start.Column = 0
+	lexer.status.CurrentToken.End.Line++
+	lexer.status.CurrentToken.End.Column = 0
 }

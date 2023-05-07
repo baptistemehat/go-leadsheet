@@ -24,7 +24,6 @@ func NewRestApi(p *pdfGenerator.PdfGenerator) (*RestApi, error) {
 		endpoints:    make(map[string]func(http.ResponseWriter, *http.Request)),
 	}
 
-	// define endpoints and handler functions
 	restApi.endpoints["/api/health"] = restApi.health
 	restApi.endpoints["/api/song"] = restApi.song
 	restApi.endpoints["/api/status"] = restApi.status
@@ -53,7 +52,7 @@ func (restApi *RestApi) ListenAndServe(addr string) {
 // health handles /health endpoint
 func (ri *RestApi) health(w http.ResponseWriter, r *http.Request) {
 
-	logger.Logger.Info().Msgf("received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
+	logger.Logger.Info().Msgf("received API request: %s %s %s", r.Method, r.URL.Path, r.URL.RawQuery)
 
 	switch r.Method {
 
@@ -69,8 +68,7 @@ func (ri *RestApi) health(w http.ResponseWriter, r *http.Request) {
 // song handles /song endpoint
 func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 
-	// TODO : find a good way to log API calls, with string reduction for query parameters
-	logger.Logger.Info().Msgf("Received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
+	logger.Logger.Info().Msgf("received API request: %s %s %s", r.Method, r.URL.Path, r.URL.RawQuery)
 
 	switch r.Method {
 
@@ -131,7 +129,7 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 // status handles /status endpoint
 func (restApi *RestApi) status(w http.ResponseWriter, r *http.Request) {
 
-	logger.Logger.Info().Msgf("Received API request: %s %s %s", r.Method, r.URL.Path, r.URL.Query())
+	logger.Logger.Info().Msgf("received API request: %s %s %s", r.Method, r.URL.Path, r.URL.RawQuery)
 
 	switch r.Method {
 

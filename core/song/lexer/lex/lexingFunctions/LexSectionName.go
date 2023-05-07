@@ -30,6 +30,6 @@ func LexSectionName(lexer *lex.Lexer) lex.LexingFunction {
 		}
 
 		// TODO : rename
-		lexer.GoToNextRune(nextRune)
+		lexer.MoveAfterRune(nextRune)
 	}
 }

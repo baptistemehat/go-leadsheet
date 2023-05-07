@@ -28,6 +28,6 @@ func LexWhisperedLyrics(lexer *lex.Lexer) lex.LexingFunction {
 			return LexRightParenthesis
 		}
 
-		lexer.GoToNextRune(nextRune)
+		lexer.MoveAfterRune(nextRune)
 	}
 }

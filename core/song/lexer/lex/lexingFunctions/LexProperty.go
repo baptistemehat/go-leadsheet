@@ -28,7 +28,7 @@ func LexPropertyKey(lexer *lex.Lexer) lex.LexingFunction {
 			return LexColumn
 		}
 
-		lexer.GoToNextRune(nextRune)
+		lexer.MoveAfterRune(nextRune)
 	}
 }
 
@@ -52,6 +52,6 @@ func LexPropertyValue(lexer *lex.Lexer) lex.LexingFunction {
 			lexer.PushToken(lexertoken.TOKEN_PROPERTY_VALUE)
 			return LexRoot
 		}
-		lexer.GoToNextRune(nextRune)
+		lexer.MoveAfterRune(nextRune)
 	}
 }

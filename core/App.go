@@ -9,6 +9,9 @@ import (
 	"github.com/baptistemehat/go-leadsheet/core/song/parser"
 )
 
+// TODO : make this path relative to the app
+const path = "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/config.yaml"
+
 type App struct {
 	restApi *api.RestApi
 }
@@ -16,27 +19,22 @@ type App struct {
 // NewApp creates a new App
 func NewApp() (*App, error) {
 
-	// a builder defines the parser and formatter to use
 	builder := pdfGenerator.Builder{
 		Parser:    parser.InlineChordParser{},
 		Formatter: &formatter.LatexSongFormatter{},
 	}
 
-	path := "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/core/config/testResources/config.yaml"
 	config, err := config.LoadConfiguration(path)
-
 	if err != nil {
 		return nil, err
 	}
 
-	// create pdf generator
 	pdfGenerator, err := pdfGenerator.NewPdfGenerator(builder, *config)
 	if err != nil {
 		logger.Logger.Fatal().Msgf("%s", err)
 		return nil, err
 	}
 
-	// create rest api
 	restApi, err := api.NewRestApi(pdfGenerator)
 	if err != nil {
 		logger.Logger.Fatal().Msgf("%s", err)

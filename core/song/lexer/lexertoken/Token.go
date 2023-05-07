@@ -9,6 +9,14 @@ type TokenPosition struct {
 	Column int
 }
 
+func NewToken() Token {
+	return Token{
+		Type:  TOKEN_UNKNOWN,
+		Value: "",
+		Start: TokenPosition{Line: 0, Column: 0},
+		End:   TokenPosition{Line: 0, Column: 0},
+	}
+}
 func (tokenPosition *TokenPosition) String() string {
 	return fmt.Sprintf("[%d:%d]", tokenPosition.Line, tokenPosition.Column)
 }

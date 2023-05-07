@@ -3,7 +3,8 @@ package lexertoken
 type TokenType int
 
 const (
-	TOKEN_ERROR TokenType = iota
+	TOKEN_UNKNOWN TokenType = iota
+	TOKEN_ERROR
 	TOKEN_EOF
 
 	TOKEN_LEFT_PARENTHESIS
@@ -23,6 +24,7 @@ const (
 )
 
 var tokenTypeToString = map[TokenType]string{
+	TOKEN_UNKNOWN:           "UNKNOWN",
 	TOKEN_ERROR:             "ERROR",
 	TOKEN_EOF:               "EOF",
 	TOKEN_LEFT_PARENTHESIS:  "LEFT_PARENTHESIS",

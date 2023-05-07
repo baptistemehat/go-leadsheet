@@ -39,6 +39,6 @@ func LexSongLine(lexer *lex.Lexer) lex.LexingFunction {
 			return nil
 		}
 
-		lexer.GoToNextRune(nextRune)
+		lexer.MoveAfterRune(nextRune)
 	}
 }
