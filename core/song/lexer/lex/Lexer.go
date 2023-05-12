@@ -31,9 +31,6 @@ func NewLexer(input string, lexingFunc LexingFunction) *Lexer {
 		positionInBuffer:   0,
 	}
 }
-func (lexer *Lexer) GetPositionInBuffer() int {
-	return lexer.positionInBuffer
-}
 
 // TODO : rename ConsumeRune /
 
@@ -48,6 +45,9 @@ func (lexer *Lexer) MoveAfterRune(nextRune rune) {
 	default:
 		lexer.positionInBuffer += utf8.RuneLen(nextRune)
 		lexer.currentToken.End.Column++
+		if nextRune == lexertoken.NEWLINE {
+			lexer.countNewline()
+		}
 	}
 }
 
@@ -85,6 +85,10 @@ func (lexer *Lexer) PushToken(tokenType lexertoken.TokenType) {
 	lexer.currentToken.Value = lexer.input[lexer.currentTokenStart:lexer.positionInBuffer]
 	lexer.tokens <- lexer.currentToken
 
+	if tokenType == lexertoken.TOKEN_NEWLINE {
+		lexer.countNewline()
+	}
+
 	lexer.currentToken.Type = lexertoken.TOKEN_UNKNOWN
 	lexer.currentToken.Value = ""
 	lexer.currentToken.Start = lexer.currentToken.End
@@ -114,7 +118,8 @@ func (lexer *Lexer) NextToken() lexertoken.Token {
 	}
 }
 
-// Errorf
+// Errorf pushes an error token in the token channel.
+// Errorf is a lexing function.
 func (lexer *Lexer) Errorf(format string, args ...interface{}) LexingFunction {
 
 	lexer.currentToken.Type = lexertoken.TOKEN_ERROR
@@ -131,17 +136,12 @@ func (lexer *Lexer) SkipWhitespace() {
 
 		nextRune := lexer.PeekRune()
 
-		if nextRune == lexertoken.NEWLINE {
-			lexer.Newline()
-		}
-
-		if !unicode.IsSpace(nextRune) {
+		if nextRune == lexertoken.EOF {
+			lexer.PushToken(lexertoken.TOKEN_EOF)
 			break
 		}
 
-		// and here we only check lexer.IsEOF ?
-		if nextRune == lexertoken.EOF {
-			lexer.PushToken(lexertoken.TOKEN_EOF)
+		if !unicode.IsSpace(nextRune) {
 			break
 		}
 
@@ -150,8 +150,8 @@ func (lexer *Lexer) SkipWhitespace() {
 	lexer.currentTokenStart = lexer.positionInBuffer
 }
 
-// Newline
-func (lexer *Lexer) Newline() {
+// countNewline
+func (lexer *Lexer) countNewline() {
 	lexer.currentToken.Start.Line++
 	lexer.currentToken.Start.Column = 0
 	lexer.currentToken.End.Line++

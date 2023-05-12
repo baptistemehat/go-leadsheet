@@ -8,7 +8,6 @@ import (
 // LexNewLine
 func LexNewLine(lexer *lex.Lexer) lex.LexingFunction {
 	lexer.MoveAfterRune(lexertoken.NEWLINE)
-	lexer.Newline()
 	lexer.PushToken(lexertoken.TOKEN_NEWLINE)
 	return LexSection
 }

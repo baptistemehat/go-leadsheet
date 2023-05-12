@@ -9,6 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// **********************
+//     TEST TOKENS
+// **********************
+
 // testTokenType is a test token type
 const testTokenType lexertoken.TokenType = -1
 
@@ -19,6 +23,10 @@ var testToken = lexertoken.Token{
 	Start: lexertoken.TokenPosition{Line: 0, Column: 0},
 	End:   lexertoken.TokenPosition{Line: 0, Column: 12},
 }
+
+// **********************
+//  LEXING FUNCTION MOCK
+// **********************
 
 // MockLexingFuncCallCounter
 type MockLexingFuncCallCounter struct {
@@ -51,29 +59,58 @@ func mockLexingFunction(lexer *Lexer) LexingFunction {
 	return mockLexingFunction
 }
 
+// **********************
+//     TEST FUNCTIONS
+// **********************
+
 // assertEqualLexer assert if two Lexers are equal.
 // This function only asserts equality for fields implementing '=='.
 // NextLexingFunction function and Tokens channel are not considred in this function.
-func assertEqualLexer(t *testing.T, lexer, otherLexer *Lexer) {
-	assert.Equal(t, lexer.input, otherLexer.input)
-	assert.Equal(t, lexer.currentToken, otherLexer.currentToken)
-	assert.Equal(t, lexer.currentTokenStart, otherLexer.currentTokenStart)
-	assert.Equal(t, lexer.positionInBuffer, otherLexer.positionInBuffer)
+func assertEqualLexer(t *testing.T, expectedLexer, actualLexer *Lexer) {
+	assert.Equal(t, expectedLexer.input, actualLexer.input)
+	assert.Equal(t, expectedLexer.currentToken, actualLexer.currentToken)
+	assert.Equal(t, expectedLexer.currentTokenStart, actualLexer.currentTokenStart)
+	assert.Equal(t, expectedLexer.positionInBuffer, actualLexer.positionInBuffer)
+}
+
+// **********************
+//      TEST CASES
+// **********************
+
+var newLexerTestCase = struct {
+	input          string
+	lexingFunction LexingFunction
+	expectedLexer  *Lexer
+}{
+	input:          "test input",
+	lexingFunction: nil,
+	expectedLexer: &Lexer{
+		input:              "test input",
+		tokens:             make(chan lexertoken.Token, 5),
+		nextLexingFunction: nil,
+		currentToken: lexertoken.Token{
+			Type:  lexertoken.TOKEN_UNKNOWN,
+			Value: "",
+			Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+			End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+		},
+		currentTokenStart: 0,
+		positionInBuffer:  0,
+	},
 }
 
 func TestNewLexer(t *testing.T) {
-	// TODO
-	NewLexer("", nil)
+	actualLexer := NewLexer(newLexerTestCase.input, newLexerTestCase.lexingFunction)
+
+	assertEqualLexer(t, newLexerTestCase.expectedLexer, actualLexer)
 }
 
-type moveAfterRuneTestCase struct {
+var moveAfterRunTestCases = []struct {
 	name          string
 	inputRune     rune
 	inputLexer    *Lexer
 	expectedLexer *Lexer
-}
-
-var moveAfterRunTestCases = []moveAfterRuneTestCase{
+}{
 	{
 		name:      "one byte rune",
 		inputRune: 'a',
@@ -131,6 +168,35 @@ var moveAfterRunTestCases = []moveAfterRuneTestCase{
 			},
 			currentTokenStart: 0,
 			positionInBuffer:  2,
+		}},
+	{
+		name:      "newline",
+		inputRune: lexertoken.NEWLINE,
+		inputLexer: &Lexer{
+			input:              "\n",
+			tokens:             make(chan lexertoken.Token, 5),
+			nextLexingFunction: nil,
+			currentToken: lexertoken.Token{
+				Type:  lexertoken.TOKEN_UNKNOWN,
+				Value: "",
+				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+				End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+			},
+			currentTokenStart: 0,
+			positionInBuffer:  0,
+		},
+		expectedLexer: &Lexer{
+			input:              "\n",
+			tokens:             make(chan lexertoken.Token, 5),
+			nextLexingFunction: nil,
+			currentToken: lexertoken.Token{
+				Type:  lexertoken.TOKEN_UNKNOWN,
+				Value: "",
+				Start: lexertoken.TokenPosition{Line: 1, Column: 0},
+				End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+			},
+			currentTokenStart: 0,
+			positionInBuffer:  1,
 		}},
 	{
 		name:      "EOF rune",
@@ -204,13 +270,11 @@ func TestMoveAfterRune(t *testing.T) {
 	}
 }
 
-type peekRunTestCase struct {
+var peekRuneTestCases = []struct {
 	name          string
 	expectedRune  rune
 	expectedLexer *Lexer
-}
-
-var peekRuneTestCases = []peekRunTestCase{
+}{
 	{
 		name:         "one byte rune",
 		expectedRune: 'c',
@@ -306,17 +370,15 @@ func TestPeekRune(t *testing.T) {
 	}
 }
 
-type pushTokenTestCase struct {
+var pushTokenTestCases = []struct {
 	name           string
 	inputTokenType lexertoken.TokenType
 	expectedToken  lexertoken.Token
 	inputLexer     *Lexer
 	expectedLexer  *Lexer
-}
-
-var pushTokenTestCases = []pushTokenTestCase{
+}{
 	{
-		name:           "basic case",
+		name:           "basic case - push lyrics token",
 		inputTokenType: lexertoken.TOKEN_LYRICS,
 		expectedToken: lexertoken.Token{
 			Type:  lexertoken.TOKEN_LYRICS,
@@ -349,6 +411,42 @@ var pushTokenTestCases = []pushTokenTestCase{
 			},
 			currentTokenStart: 4,
 			positionInBuffer:  4,
+		},
+	},
+	{
+		name:           "newline",
+		inputTokenType: lexertoken.TOKEN_NEWLINE,
+		expectedToken: lexertoken.Token{
+			Type:  lexertoken.TOKEN_NEWLINE,
+			Value: string(lexertoken.NEWLINE),
+			Start: lexertoken.TokenPosition{Line: 0, Column: 5},
+			End:   lexertoken.TokenPosition{Line: 0, Column: 6},
+		},
+		inputLexer: &Lexer{
+			input:              "abcde\nfghij",
+			tokens:             make(chan lexertoken.Token, 5),
+			nextLexingFunction: nil,
+			currentToken: lexertoken.Token{
+				Type:  lexertoken.TOKEN_UNKNOWN,
+				Value: "",
+				Start: lexertoken.TokenPosition{Line: 0, Column: 5},
+				End:   lexertoken.TokenPosition{Line: 0, Column: 6},
+			},
+			currentTokenStart: 5,
+			positionInBuffer:  6,
+		},
+		expectedLexer: &Lexer{
+			input:              "abcde\nfghij",
+			tokens:             make(chan lexertoken.Token, 5),
+			nextLexingFunction: nil,
+			currentToken: lexertoken.Token{
+				Type:  lexertoken.TOKEN_UNKNOWN,
+				Value: "",
+				Start: lexertoken.TokenPosition{Line: 1, Column: 0},
+				End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+			},
+			currentTokenStart: 6,
+			positionInBuffer:  6,
 		},
 	},
 	{
@@ -595,14 +693,206 @@ func TestNextToken(t *testing.T) {
 	})
 }
 
+var errorfTestCase = struct {
+	inputFormatMessage string
+	inputArgument      interface{}
+	expectedCallCount  int
+	inputLexer         *Lexer
+	expectedLexer      *Lexer
+}{
+	inputFormatMessage: "test message: %d",
+	inputArgument:      12,
+	expectedCallCount:  0,
+	inputLexer: &Lexer{
+		input:              "abcde",
+		tokens:             make(chan lexertoken.Token, 5),
+		nextLexingFunction: nil,
+		currentToken: lexertoken.Token{
+			Type:  lexertoken.TOKEN_UNKNOWN,
+			Value: "bcd",
+			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
+			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+		},
+		currentTokenStart: 1,
+		positionInBuffer:  4,
+	},
+	expectedLexer: &Lexer{
+		input:              "abcde",
+		tokens:             make(chan lexertoken.Token, 5),
+		nextLexingFunction: nil,
+		currentToken: lexertoken.Token{
+			Type:  lexertoken.TOKEN_ERROR,
+			Value: "test message: 12",
+			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
+			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+		},
+
+		currentTokenStart: 1,
+		positionInBuffer:  4,
+	},
+}
+
 func TestErrorf(t *testing.T) {
-	// TODO
+	mockLexingFuncCallCounter.ResetCount()
+
+	actualLexingFunction := errorfTestCase.inputLexer.Errorf(errorfTestCase.inputFormatMessage, errorfTestCase.inputArgument)
+
+	assert.Nil(t, actualLexingFunction)
+	assert.Equal(t, errorfTestCase.expectedCallCount, mockLexingFuncCallCounter.GetCount())
+	assertEqualLexer(t, errorfTestCase.expectedLexer, errorfTestCase.inputLexer)
+
+}
+
+var skipWhitespaceTestCase_skipWhitespaceWithNewline = struct {
+	name              string
+	expectedCallCount int
+	inputLexer        *Lexer
+	expectedLexer     *Lexer
+}{
+	name:              "skip whitespaces with newline",
+	expectedCallCount: 0,
+	inputLexer: &Lexer{
+		input:              " \t\r\nabcde",
+		tokens:             make(chan lexertoken.Token, 5),
+		nextLexingFunction: nil,
+		currentToken: lexertoken.Token{
+			Type:  lexertoken.TOKEN_UNKNOWN,
+			Value: "",
+			Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+			End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+		},
+		currentTokenStart: 0,
+		positionInBuffer:  0,
+	},
+	expectedLexer: &Lexer{
+		input:              " \t\r\nabcde",
+		tokens:             make(chan lexertoken.Token, 5),
+		nextLexingFunction: nil,
+		currentToken: lexertoken.Token{
+			Type:  lexertoken.TOKEN_UNKNOWN,
+			Value: "",
+			Start: lexertoken.TokenPosition{Line: 1, Column: 0},
+			End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+		},
+		currentTokenStart: 4,
+		positionInBuffer:  4,
+	},
+}
+
+var skipWhitespaceTestCase_EOF = struct {
+	name              string
+	expectedCallCount int
+	expectedToken     lexertoken.Token
+	inputLexer        *Lexer
+	expectedLexer     *Lexer
+}{
+	name: "EOF",
+	expectedToken: lexertoken.Token{
+		Type:  lexertoken.TOKEN_EOF,
+		Value: "abcde \n",
+		Start: lexertoken.TokenPosition{Line: 1, Column: 0},
+		End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+	},
+	inputLexer: &Lexer{
+		input:              "abcde \n",
+		tokens:             make(chan lexertoken.Token, 5),
+		nextLexingFunction: nil,
+		currentToken: lexertoken.Token{
+			Type:  lexertoken.TOKEN_UNKNOWN,
+			Value: "abcde",
+			Start: lexertoken.TokenPosition{Line: 0, Column: 0},
+			End:   lexertoken.TokenPosition{Line: 0, Column: 5},
+		},
+		currentTokenStart: 0,
+		positionInBuffer:  5,
+	},
+	expectedLexer: &Lexer{
+		input:              "abcde \n",
+		tokens:             make(chan lexertoken.Token, 5),
+		nextLexingFunction: nil,
+		currentToken: lexertoken.Token{
+			Type:  lexertoken.TOKEN_UNKNOWN,
+			Value: "",
+			Start: lexertoken.TokenPosition{Line: 1, Column: 0},
+			End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+		},
+		currentTokenStart: 7,
+		positionInBuffer:  7,
+	},
 }
 
 func TestSkipWitheSpace(t *testing.T) {
-	// TODO
+	t.Run(skipWhitespaceTestCase_skipWhitespaceWithNewline.name, func(t *testing.T) {
+		mockLexingFuncCallCounter.ResetCount()
+
+		skipWhitespaceTestCase_skipWhitespaceWithNewline.inputLexer.SkipWhitespace()
+
+		assert.Equal(t, skipWhitespaceTestCase_skipWhitespaceWithNewline.expectedCallCount, mockLexingFuncCallCounter.GetCount())
+		assertEqualLexer(t, skipWhitespaceTestCase_skipWhitespaceWithNewline.expectedLexer, skipWhitespaceTestCase_skipWhitespaceWithNewline.inputLexer)
+	})
+	t.Run(skipWhitespaceTestCase_EOF.name, func(t *testing.T) {
+		mockLexingFuncCallCounter.ResetCount()
+
+		skipWhitespaceTestCase_EOF.inputLexer.SkipWhitespace()
+
+		assert.Equal(t, skipWhitespaceTestCase_EOF.expectedCallCount, mockLexingFuncCallCounter.GetCount())
+		assertEqualLexer(t, skipWhitespaceTestCase_EOF.expectedLexer, skipWhitespaceTestCase_EOF.inputLexer)
+
+		select {
+		case actualToken := <-skipWhitespaceTestCase_EOF.inputLexer.tokens:
+			assert.Equal(t, skipWhitespaceTestCase_EOF.expectedToken, actualToken)
+		default:
+			t.Fatal("token channel should contain a token")
+		}
+
+		select {
+		case <-skipWhitespaceTestCase_EOF.inputLexer.tokens:
+			t.Fatal("no more token should be present on channel")
+		default:
+		}
+	})
+}
+
+var newlineTestCase = struct {
+	expectedCallCount int
+	inputLexer        *Lexer
+	expectedLexer     *Lexer
+}{
+	expectedCallCount: 0,
+	inputLexer: &Lexer{
+		input:              "abcde",
+		tokens:             make(chan lexertoken.Token, 5),
+		nextLexingFunction: mockLexingFunction,
+		currentToken: lexertoken.Token{
+			Type:  lexertoken.TOKEN_UNKNOWN,
+			Value: "bcd",
+			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
+			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+		},
+		currentTokenStart: 1,
+		positionInBuffer:  4,
+	},
+	expectedLexer: &Lexer{
+		input:              "abcde",
+		tokens:             make(chan lexertoken.Token, 5),
+		nextLexingFunction: mockLexingFunction,
+		currentToken: lexertoken.Token{
+			Type:  lexertoken.TOKEN_UNKNOWN,
+			Value: "bcd",
+			Start: lexertoken.TokenPosition{Line: 1, Column: 0},
+			End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+		},
+
+		currentTokenStart: 1,
+		positionInBuffer:  4,
+	},
 }
 
 func TestNewLine(t *testing.T) {
-	// TODO
+	mockLexingFuncCallCounter.ResetCount()
+
+	newlineTestCase.inputLexer.countNewline()
+
+	assert.Equal(t, newlineTestCase.expectedCallCount, mockLexingFuncCallCounter.GetCount())
+	assertEqualLexer(t, newlineTestCase.expectedLexer, newlineTestCase.inputLexer)
 }
