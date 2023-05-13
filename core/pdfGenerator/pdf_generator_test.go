@@ -5,12 +5,12 @@ import (
 
 	"github.com/baptistemehat/go-leadsheet/core/config"
 	"github.com/baptistemehat/go-leadsheet/core/song/formatter"
-	"github.com/baptistemehat/go-leadsheet/core/song/parser"
+	"github.com/baptistemehat/go-leadsheet/core/song/parsing"
 )
 
 func TestGeneratePdfFromBuffer(t *testing.T) {
 	builder := Builder{
-		Parser:    parser.InlineChordParser{},
+		Parser:    parsing.InlineChordParser{},
 		Formatter: &formatter.LatexSongFormatter{},
 	}
 

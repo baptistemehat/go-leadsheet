@@ -7,7 +7,7 @@ import (
 	"github.com/baptistemehat/go-leadsheet/core/common/logger"
 	"github.com/baptistemehat/go-leadsheet/core/config"
 	"github.com/baptistemehat/go-leadsheet/core/song/model"
-	"github.com/baptistemehat/go-leadsheet/core/song/parser"
+	"github.com/baptistemehat/go-leadsheet/core/song/parsing"
 )
 
 // Generation status
@@ -37,7 +37,7 @@ func (s Status) String() string {
 
 // Builder stores parser and formatter to use for text processing
 type Builder struct {
-	Parser    parser.Parser
+	Parser    parsing.Parser
 	Formatter model.Formatter
 }
 
