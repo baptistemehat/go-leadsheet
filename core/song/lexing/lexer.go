@@ -1,34 +1,30 @@
-package lex
+package lexing
 
 import (
 	"fmt"
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexererrors"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
 )
 
 type Lexer struct {
 	input              string
-	tokens             chan lexertoken.Token
+	tokens             chan Token
+	currentToken       Token
 	nextLexingFunction LexingFunction
+	position           int
 	currentTokenStart  int
-	currentToken       lexertoken.Token
-	// positionInBuffer is index of the lexer within the Input string.
-	// Since it is used to index a string, positionInBuffer counts in bytes, not runes
-	positionInBuffer int
 }
 
 // NewLexer creates a new lexer
 func NewLexer(input string, lexingFunc LexingFunction) *Lexer {
 	return &Lexer{
 		input:              input,
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
+		currentToken:       NewToken(),
 		nextLexingFunction: lexingFunc,
-		currentToken:       lexertoken.NewToken(),
+		position:           0,
 		currentTokenStart:  0,
-		positionInBuffer:   0,
 	}
 }
 
@@ -38,14 +34,14 @@ func NewLexer(input string, lexingFunc LexingFunction) *Lexer {
 func (lexer *Lexer) MoveAfterRune(nextRune rune) {
 	switch nextRune {
 	// TODO : rename to be rune
-	case lexertoken.EOF:
+	case RUNE_EOF:
 		return
-	case lexertoken.ERROR:
+	case RUNE_ERROR:
 		return
 	default:
-		lexer.positionInBuffer += utf8.RuneLen(nextRune)
+		lexer.position += utf8.RuneLen(nextRune)
 		lexer.currentToken.End.Column++
-		if nextRune == lexertoken.NEWLINE {
+		if nextRune == RUNE_NEWLINE {
 			lexer.countNewline()
 		}
 	}
@@ -55,60 +51,61 @@ func (lexer *Lexer) MoveAfterRune(nextRune rune) {
 // Returns EOF if OEF is reached.
 // Returns ERROR if error occured while reading next rune.
 func (lexer *Lexer) PeekRune() rune {
+
 	// if position reached last rune of input
-	if lexer.positionInBuffer >= len(lexer.input) {
-		return lexertoken.EOF
+	if lexer.position >= len(lexer.input) {
+		return RUNE_EOF
 	}
 
 	// get next rune in input
-	nextRune, _ := utf8.DecodeRuneInString(lexer.input[lexer.positionInBuffer:])
+	nextRune, _ := utf8.DecodeRuneInString(lexer.input[lexer.position:])
 	if nextRune == utf8.RuneError {
-		return lexertoken.ERROR
+		return RUNE_ERROR
 	}
 	return nextRune
 }
 
 // PushToken pushes a token into the token channel
-func (lexer *Lexer) PushToken(tokenType lexertoken.TokenType) {
+func (lexer *Lexer) PushToken(tokenType TokenType) {
 
 	if lexer.currentTokenStart > len(lexer.input) {
-		lexer.Errorf(lexererrors.LEXER_ERROR_START_OF_TOKEN_AFTER_EOF)
+		lexer.Errorf(LEXER_ERROR_START_OF_TOKEN_AFTER_EOF)
 		return
 	}
 
-	if lexer.positionInBuffer > len(lexer.input) {
-		lexer.Errorf(lexererrors.LEXER_ERROR_POSITION_AFTER_EOF)
+	if lexer.position > len(lexer.input) {
+		lexer.Errorf(LEXER_ERROR_POSITION_AFTER_EOF)
 		return
 	}
 
+	// prepare token and push it
 	lexer.currentToken.Type = tokenType
-	lexer.currentToken.Value = lexer.input[lexer.currentTokenStart:lexer.positionInBuffer]
+	lexer.currentToken.Value = lexer.input[lexer.currentTokenStart:lexer.position]
 	lexer.tokens <- lexer.currentToken
 
-	if tokenType == lexertoken.TOKEN_NEWLINE {
-		lexer.countNewline()
-	}
-
-	lexer.currentToken.Type = lexertoken.TOKEN_UNKNOWN
+	// reset token
+	lexer.currentToken.Type = TOKEN_UNKNOWN
 	lexer.currentToken.Value = ""
 	lexer.currentToken.Start = lexer.currentToken.End
 
-	lexer.currentTokenStart = lexer.positionInBuffer
+	// update positions
+	lexer.currentTokenStart = lexer.position
+	if tokenType == TOKEN_NEWLINE {
+		lexer.countNewline()
+	}
 }
 
 // NextToken procedes lexing until a token is produced and returns it
-func (lexer *Lexer) NextToken() lexertoken.Token {
+func (lexer *Lexer) NextToken() Token {
 	for {
 		select {
-		// try to pull token from channel
 		case token := <-lexer.tokens:
 			return token
-		// if no token to pull, resume lexing
 		default:
 			if lexer.nextLexingFunction == nil {
 
-				lexer.currentToken.Type = lexertoken.TOKEN_ERROR
-				lexer.currentToken.Value = fmt.Sprint(lexererrors.LEXER_ERROR_NIL_LEXING_FUNCTION)
+				lexer.currentToken.Type = TOKEN_ERROR
+				lexer.currentToken.Value = fmt.Sprint(LEXER_ERROR_NIL_LEXING_FUNCTION)
 
 				return lexer.currentToken
 			}
@@ -122,7 +119,7 @@ func (lexer *Lexer) NextToken() lexertoken.Token {
 // Errorf is a lexing function.
 func (lexer *Lexer) Errorf(format string, args ...interface{}) LexingFunction {
 
-	lexer.currentToken.Type = lexertoken.TOKEN_ERROR
+	lexer.currentToken.Type = TOKEN_ERROR
 	lexer.currentToken.Value = fmt.Sprintf(format, args...)
 
 	lexer.tokens <- lexer.currentToken
@@ -130,14 +127,16 @@ func (lexer *Lexer) Errorf(format string, args ...interface{}) LexingFunction {
 	return nil
 }
 
-// SkipWhitespace
+// SkipWhitespace moves position to the next non-whitespaces rune.
+// Non-whitespace runes are all runes for which utf8.IsSpace returns false.
+// If EOF is reached, pushes an EOF 
 func (lexer *Lexer) SkipWhitespace() {
 	for {
 
 		nextRune := lexer.PeekRune()
 
-		if nextRune == lexertoken.EOF {
-			lexer.PushToken(lexertoken.TOKEN_EOF)
+		if nextRune == RUNE_EOF {
+			lexer.PushToken(TOKEN_EOF)
 			break
 		}
 
@@ -147,7 +146,8 @@ func (lexer *Lexer) SkipWhitespace() {
 
 		lexer.MoveAfterRune(nextRune)
 	}
-	lexer.currentTokenStart = lexer.positionInBuffer
+
+	lexer.currentTokenStart = lexer.position
 }
 
 // countNewline

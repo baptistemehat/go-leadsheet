@@ -5,9 +5,8 @@ import (
 	"strings"
 
 	"github.com/baptistemehat/go-leadsheet/core/common/logger"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex/lexingFunctions"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
+	"github.com/baptistemehat/go-leadsheet/core/song/lexing"
+	"github.com/baptistemehat/go-leadsheet/core/song/lexing/lexing_functions"
 	"github.com/baptistemehat/go-leadsheet/core/song/model"
 )
 
@@ -33,7 +32,7 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 	line := model.NewLine()
 	section := model.NewSection()
 	song := model.NewSong()
-	lexer := lex.NewLexer(input, lexingFunctions.LexRoot)
+	lexer := lexing.NewLexer(input, lexingFunctions.LexRoot)
 
 	for terminate := false; !terminate; {
 		// lex next token
@@ -43,7 +42,7 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 
 		// trim all non lyrics tokens
 		// we need to keep spaces in lyrics
-		if token.Type != lexertoken.TOKEN_LYRICS {
+		if token.Type != lexing.TOKEN_LYRICS {
 			tokenValue = strings.TrimSpace(token.Value)
 		} else {
 			tokenValue = token.Value
@@ -51,11 +50,11 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 
 		switch token.Type {
 
-		case lexertoken.TOKEN_ERROR:
+		case lexing.TOKEN_ERROR:
 			logger.Logger.Error().Msgf("error while parsing input: %s", tokenValue)
 			terminate = true
 
-		case lexertoken.TOKEN_EOF:
+		case lexing.TOKEN_EOF:
 			// if a section is being parsed
 			if len(section.Name) > 0 {
 
@@ -66,14 +65,14 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 			// EOF, terminate parsing
 			terminate = true
 
-		case lexertoken.TOKEN_PROPERTY_KEY:
+		case lexing.TOKEN_PROPERTY_KEY:
 			propertyKey = tokenValue
 
-		case lexertoken.TOKEN_PROPERTY_VALUE:
+		case lexing.TOKEN_PROPERTY_VALUE:
 			song.Properties.SetProperty(propertyKey, tokenValue)
 			propertyKey = ""
 
-		case lexertoken.TOKEN_SECTION_NAME:
+		case lexing.TOKEN_SECTION_NAME:
 
 			// if a section is being parsed
 			if len(section.Name) > 0 {
@@ -86,12 +85,12 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 			section.Clear()
 			section.SetName(tokenValue)
 
-		case lexertoken.TOKEN_LYRICS:
+		case lexing.TOKEN_LYRICS:
 
 			// accumulate lyrics to produce lyrics line
 			line.AppendLyrics(tokenValue)
 
-		case lexertoken.TOKEN_NEWLINE:
+		case lexing.TOKEN_NEWLINE:
 
 			// if a line is being parsed
 			if !line.IsEmpty() {
@@ -103,7 +102,7 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 			// clear line for future parsing
 			line.Clear()
 
-		case lexertoken.TOKEN_CHORD:
+		case lexing.TOKEN_CHORD:
 
 			// parse chord
 			chord, err := model.ParseChord(tokenValue)
@@ -113,10 +112,10 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 
 			line.AddChord(chord, uint8(len(line.Lyrics)))
 
-		case lexertoken.TOKEN_LEFT_PARENTHESIS:
+		case lexing.TOKEN_LEFT_PARENTHESIS:
 			// TODO : enter "whispered" context
 
-		case lexertoken.TOKEN_RIGHT_PARENTHESIS:
+		case lexing.TOKEN_RIGHT_PARENTHESIS:
 			// TODO : exit "whispered" context
 		}
 	}

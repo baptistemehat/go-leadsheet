@@ -1,30 +1,29 @@
 package lexingFunctions
 
 import (
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
+	"github.com/baptistemehat/go-leadsheet/core/song/lexing"
 )
 
 // LexPropertyKey lexes property keys
 // Syntax: <PropertyKey>: <PropertyValue>
-func LexPropertyKey(lexer *lex.Lexer) lex.LexingFunction {
+func LexPropertyKey(lexer *lexing.Lexer) lexing.LexingFunction {
 
 	for {
 		nextRune := lexer.PeekRune()
 
 		switch nextRune {
 
-		case lexertoken.EOF:
+		case lexing.RUNE_EOF:
 			// TODO : normalise error messages
 			lexer.Errorf("unexpected EOF while parsing property key")
 			return nil
 
-		case lexertoken.ERROR:
+		case lexing.RUNE_ERROR:
 			lexer.Errorf("unexpected character found")
 			return nil
 
-		case lexertoken.COLUMN:
-			lexer.PushToken(lexertoken.TOKEN_PROPERTY_KEY)
+		case lexing.RUNE_COLUMN:
+			lexer.PushToken(lexing.TOKEN_PROPERTY_KEY)
 			return LexColumn
 		}
 
@@ -33,23 +32,23 @@ func LexPropertyKey(lexer *lex.Lexer) lex.LexingFunction {
 }
 
 // LexPropertyValue
-func LexPropertyValue(lexer *lex.Lexer) lex.LexingFunction {
+func LexPropertyValue(lexer *lexing.Lexer) lexing.LexingFunction {
 	for {
 		nextRune := lexer.PeekRune()
 
 		switch nextRune {
 
-		case lexertoken.EOF:
+		case lexing.RUNE_EOF:
 			// TODO : normalise error messages
 			lexer.Errorf("unexpected EOF while parsing property value")
 			return nil
 
-		case lexertoken.ERROR:
+		case lexing.RUNE_ERROR:
 			lexer.Errorf("unexpected character found")
 			return nil
 
-		case lexertoken.NEWLINE:
-			lexer.PushToken(lexertoken.TOKEN_PROPERTY_VALUE)
+		case lexing.RUNE_NEWLINE:
+			lexer.PushToken(lexing.TOKEN_PROPERTY_VALUE)
 			return LexRoot
 		}
 		lexer.MoveAfterRune(nextRune)

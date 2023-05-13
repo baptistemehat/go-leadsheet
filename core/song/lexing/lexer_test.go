@@ -1,11 +1,9 @@
-package lex
+package lexing
 
 import (
 	"testing"
 	"unicode/utf8"
 
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexererrors"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,14 +12,14 @@ import (
 // **********************
 
 // testTokenType is a test token type
-const testTokenType lexertoken.TokenType = -1
+const testTokenType TokenType = -1
 
 // testToken is a test token
-var testToken = lexertoken.Token{
+var testToken = Token{
 	Type:  testTokenType,
 	Value: "test",
-	Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-	End:   lexertoken.TokenPosition{Line: 0, Column: 12},
+	Start: TokenPosition{Line: 0, Column: 0},
+	End:   TokenPosition{Line: 0, Column: 12},
 }
 
 // **********************
@@ -70,7 +68,7 @@ func assertEqualLexer(t *testing.T, expectedLexer, actualLexer *Lexer) {
 	assert.Equal(t, expectedLexer.input, actualLexer.input)
 	assert.Equal(t, expectedLexer.currentToken, actualLexer.currentToken)
 	assert.Equal(t, expectedLexer.currentTokenStart, actualLexer.currentTokenStart)
-	assert.Equal(t, expectedLexer.positionInBuffer, actualLexer.positionInBuffer)
+	assert.Equal(t, expectedLexer.position, actualLexer.position)
 }
 
 // **********************
@@ -86,16 +84,16 @@ var newLexerTestCase = struct {
 	lexingFunction: nil,
 	expectedLexer: &Lexer{
 		input:              "test input",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: nil,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+			Start: TokenPosition{Line: 0, Column: 0},
+			End:   TokenPosition{Line: 0, Column: 0},
 		},
 		currentTokenStart: 0,
-		positionInBuffer:  0,
+		position:          0,
 	},
 }
 
@@ -116,145 +114,145 @@ var moveAfterRunTestCases = []struct {
 		inputRune: 'a',
 		inputLexer: &Lexer{
 			input:              "abcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 2},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+				Start: TokenPosition{Line: 0, Column: 2},
+				End:   TokenPosition{Line: 0, Column: 4},
 			},
 			currentTokenStart: 2,
-			positionInBuffer:  4,
+			position:          4,
 		},
 		expectedLexer: &Lexer{
 			input:              "abcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 2},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 5},
+				Start: TokenPosition{Line: 0, Column: 2},
+				End:   TokenPosition{Line: 0, Column: 5},
 			},
 			currentTokenStart: 2,
-			positionInBuffer:  5,
+			position:          5,
 		}},
 	{
 		name:      "two byte rune",
 		inputRune: 'ä',
 		inputLexer: &Lexer{
 			input:              "äbcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 0},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  0,
+			position:          0,
 		},
 		expectedLexer: &Lexer{
 			input:              "äbcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 1},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 1},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  2,
+			position:          2,
 		}},
 	{
 		name:      "newline",
-		inputRune: lexertoken.NEWLINE,
+		inputRune: RUNE_NEWLINE,
 		inputLexer: &Lexer{
 			input:              "\n",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 0},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  0,
+			position:          0,
 		},
 		expectedLexer: &Lexer{
 			input:              "\n",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 1, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+				Start: TokenPosition{Line: 1, Column: 0},
+				End:   TokenPosition{Line: 1, Column: 0},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  1,
+			position:          1,
 		}},
 	{
 		name:      "EOF rune",
-		inputRune: lexertoken.EOF,
+		inputRune: RUNE_EOF,
 		inputLexer: &Lexer{
 			input:              "",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 0},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  0,
+			position:          0,
 		},
 		expectedLexer: &Lexer{
 			input:              "",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 0},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  0,
+			position:          0,
 		}},
 	{
 		name:      "ERROR rune",
-		inputRune: lexertoken.ERROR,
+		inputRune: RUNE_ERROR,
 		inputLexer: &Lexer{
 			input:              "",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 0},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  0,
+			position:          0,
 		},
 		expectedLexer: &Lexer{
 			input:              "",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 0},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  0,
+			position:          0,
 		}},
 }
 
@@ -280,80 +278,80 @@ var peekRuneTestCases = []struct {
 		expectedRune: 'c',
 		expectedLexer: &Lexer{
 			input:              "abcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "ab",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 2},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 2},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  2,
+			position:          2,
 		}},
 	{
 		name:         "two byte rune",
 		expectedRune: 'ä',
 		expectedLexer: &Lexer{
 			input:              "äbcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 0},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  0,
+			position:          0,
 		}},
 	{
 		name:         "empty input",
-		expectedRune: lexertoken.EOF,
+		expectedRune: RUNE_EOF,
 		expectedLexer: &Lexer{
 			input:              "",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 0},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  0,
+			position:          0,
 		}},
 	{
 		name:         "EOF",
-		expectedRune: lexertoken.EOF,
+		expectedRune: RUNE_EOF,
 		expectedLexer: &Lexer{
 			input:              "abcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "ab",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 5},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 5},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  5,
+			position:          5,
 		}},
 	{
 		name:         "RuneError",
-		expectedRune: lexertoken.ERROR,
+		expectedRune: RUNE_ERROR,
 		expectedLexer: &Lexer{
 			input:              string(utf8.RuneError),
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 0},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  0,
+			position:          0,
 		}},
 }
 
@@ -372,153 +370,153 @@ func TestPeekRune(t *testing.T) {
 
 var pushTokenTestCases = []struct {
 	name           string
-	inputTokenType lexertoken.TokenType
-	expectedToken  lexertoken.Token
+	inputTokenType TokenType
+	expectedToken  Token
 	inputLexer     *Lexer
 	expectedLexer  *Lexer
 }{
 	{
 		name:           "basic case - push lyrics token",
-		inputTokenType: lexertoken.TOKEN_LYRICS,
-		expectedToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_LYRICS,
+		inputTokenType: TOKEN_LYRICS,
+		expectedToken: Token{
+			Type:  TOKEN_LYRICS,
 			Value: "bcd",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+			Start: TokenPosition{Line: 0, Column: 1},
+			End:   TokenPosition{Line: 0, Column: 4},
 		},
 		inputLexer: &Lexer{
 			input:              "abcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "bcd",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+				Start: TokenPosition{Line: 0, Column: 1},
+				End:   TokenPosition{Line: 0, Column: 4},
 			},
 			currentTokenStart: 1,
-			positionInBuffer:  4,
+			position:          4,
 		},
 		expectedLexer: &Lexer{
 			input:              "abcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 4},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+				Start: TokenPosition{Line: 0, Column: 4},
+				End:   TokenPosition{Line: 0, Column: 4},
 			},
 			currentTokenStart: 4,
-			positionInBuffer:  4,
+			position:          4,
 		},
 	},
 	{
 		name:           "newline",
-		inputTokenType: lexertoken.TOKEN_NEWLINE,
-		expectedToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_NEWLINE,
-			Value: string(lexertoken.NEWLINE),
-			Start: lexertoken.TokenPosition{Line: 0, Column: 5},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 6},
+		inputTokenType: TOKEN_NEWLINE,
+		expectedToken: Token{
+			Type:  TOKEN_NEWLINE,
+			Value: string(RUNE_NEWLINE),
+			Start: TokenPosition{Line: 0, Column: 5},
+			End:   TokenPosition{Line: 0, Column: 6},
 		},
 		inputLexer: &Lexer{
 			input:              "abcde\nfghij",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 5},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 6},
+				Start: TokenPosition{Line: 0, Column: 5},
+				End:   TokenPosition{Line: 0, Column: 6},
 			},
 			currentTokenStart: 5,
-			positionInBuffer:  6,
+			position:          6,
 		},
 		expectedLexer: &Lexer{
 			input:              "abcde\nfghij",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "",
-				Start: lexertoken.TokenPosition{Line: 1, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+				Start: TokenPosition{Line: 1, Column: 0},
+				End:   TokenPosition{Line: 1, Column: 0},
 			},
 			currentTokenStart: 6,
-			positionInBuffer:  6,
+			position:          6,
 		},
 	},
 	{
 		name:           "current token start position out of file",
-		inputTokenType: lexertoken.TOKEN_LYRICS,
-		expectedToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_ERROR,
-			Value: lexererrors.LEXER_ERROR_START_OF_TOKEN_AFTER_EOF,
-			Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 5},
+		inputTokenType: TOKEN_LYRICS,
+		expectedToken: Token{
+			Type:  TOKEN_ERROR,
+			Value: LEXER_ERROR_START_OF_TOKEN_AFTER_EOF,
+			Start: TokenPosition{Line: 0, Column: 0},
+			End:   TokenPosition{Line: 0, Column: 5},
 		},
 		inputLexer: &Lexer{
 			input:              "abcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "abcde",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 5},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 5},
 			},
 			currentTokenStart: 6,
-			positionInBuffer:  5,
+			position:          5,
 		},
 		expectedLexer: &Lexer{
 			input:              "abcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_ERROR,
-				Value: lexererrors.LEXER_ERROR_START_OF_TOKEN_AFTER_EOF,
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 5},
+			currentToken: Token{
+				Type:  TOKEN_ERROR,
+				Value: LEXER_ERROR_START_OF_TOKEN_AFTER_EOF,
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 5},
 			},
 			currentTokenStart: 6,
-			positionInBuffer:  5,
+			position:          5,
 		},
 	},
 	{
 		name:           "lexer position out of file",
-		inputTokenType: lexertoken.TOKEN_LYRICS,
-		expectedToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_ERROR,
-			Value: lexererrors.LEXER_ERROR_POSITION_AFTER_EOF,
-			Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 5},
+		inputTokenType: TOKEN_LYRICS,
+		expectedToken: Token{
+			Type:  TOKEN_ERROR,
+			Value: LEXER_ERROR_POSITION_AFTER_EOF,
+			Start: TokenPosition{Line: 0, Column: 0},
+			End:   TokenPosition{Line: 0, Column: 5},
 		},
 		inputLexer: &Lexer{
 			input:              "abcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_UNKNOWN,
+			currentToken: Token{
+				Type:  TOKEN_UNKNOWN,
 				Value: "abcde",
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 5},
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 5},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  6,
+			position:          6,
 		},
 		expectedLexer: &Lexer{
 			input:              "abcde",
-			tokens:             make(chan lexertoken.Token, 5),
+			tokens:             make(chan Token, 5),
 			nextLexingFunction: nil,
-			currentToken: lexertoken.Token{
-				Type:  lexertoken.TOKEN_ERROR,
-				Value: lexererrors.LEXER_ERROR_POSITION_AFTER_EOF,
-				Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-				End:   lexertoken.TokenPosition{Line: 0, Column: 5},
+			currentToken: Token{
+				Type:  TOKEN_ERROR,
+				Value: LEXER_ERROR_POSITION_AFTER_EOF,
+				Start: TokenPosition{Line: 0, Column: 0},
+				End:   TokenPosition{Line: 0, Column: 5},
 			},
 			currentTokenStart: 0,
-			positionInBuffer:  6,
+			position:          6,
 		},
 	},
 }
@@ -549,7 +547,7 @@ func TestPushToken(t *testing.T) {
 
 type nextTokenTestCase struct {
 	name              string
-	expectedToken     lexertoken.Token
+	expectedToken     Token
 	expectedCallCount int
 	inputLexer        *Lexer
 	expectedLexer     *Lexer
@@ -561,29 +559,29 @@ var nextTokenTestCase_tokenInChannel = nextTokenTestCase{
 	expectedCallCount: 0,
 	inputLexer: &Lexer{
 		input:              "abcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: mockLexingFunction,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "bcd",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+			Start: TokenPosition{Line: 0, Column: 1},
+			End:   TokenPosition{Line: 0, Column: 4},
 		},
 		currentTokenStart: 1,
-		positionInBuffer:  4,
+		position:          4,
 	},
 	expectedLexer: &Lexer{
 		input:              "abcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: mockLexingFunction,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "bcd",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+			Start: TokenPosition{Line: 0, Column: 1},
+			End:   TokenPosition{Line: 0, Column: 4},
 		},
 		currentTokenStart: 1,
-		positionInBuffer:  4,
+		position:          4,
 	},
 }
 var nextTokenTestCase_noTokenInChannel = nextTokenTestCase{
@@ -592,67 +590,67 @@ var nextTokenTestCase_noTokenInChannel = nextTokenTestCase{
 	expectedCallCount: 1,
 	inputLexer: &Lexer{
 		input:              "abcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: mockLexingFunction,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "bcd",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+			Start: TokenPosition{Line: 0, Column: 1},
+			End:   TokenPosition{Line: 0, Column: 4},
 		},
 		currentTokenStart: 1,
-		positionInBuffer:  4,
+		position:          4,
 	},
 	expectedLexer: &Lexer{
 		input:              "abcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: mockLexingFunction,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "bcd",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+			Start: TokenPosition{Line: 0, Column: 1},
+			End:   TokenPosition{Line: 0, Column: 4},
 		},
 		currentTokenStart: 1,
-		positionInBuffer:  4,
+		position:          4,
 	},
 }
 var nextTokenTestCase_nilLexingFunc = nextTokenTestCase{
 	name: "nil lexing function",
-	expectedToken: lexertoken.Token{
-		Type:  lexertoken.TOKEN_ERROR,
-		Value: lexererrors.LEXER_ERROR_NIL_LEXING_FUNCTION,
-		Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-		End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+	expectedToken: Token{
+		Type:  TOKEN_ERROR,
+		Value: LEXER_ERROR_NIL_LEXING_FUNCTION,
+		Start: TokenPosition{Line: 0, Column: 1},
+		End:   TokenPosition{Line: 0, Column: 4},
 	},
 
 	expectedCallCount: 0,
 	inputLexer: &Lexer{
 		input:              "abcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: nil,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "bcd",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+			Start: TokenPosition{Line: 0, Column: 1},
+			End:   TokenPosition{Line: 0, Column: 4},
 		},
 		currentTokenStart: 1,
-		positionInBuffer:  4,
+		position:          4,
 	},
 	expectedLexer: &Lexer{
 		input:              "abcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: mockLexingFunction,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_ERROR,
-			Value: lexererrors.LEXER_ERROR_NIL_LEXING_FUNCTION,
-			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+		currentToken: Token{
+			Type:  TOKEN_ERROR,
+			Value: LEXER_ERROR_NIL_LEXING_FUNCTION,
+			Start: TokenPosition{Line: 0, Column: 1},
+			End:   TokenPosition{Line: 0, Column: 4},
 		},
 
 		currentTokenStart: 1,
-		positionInBuffer:  4,
+		position:          4,
 	},
 }
 
@@ -705,30 +703,30 @@ var errorfTestCase = struct {
 	expectedCallCount:  0,
 	inputLexer: &Lexer{
 		input:              "abcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: nil,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "bcd",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+			Start: TokenPosition{Line: 0, Column: 1},
+			End:   TokenPosition{Line: 0, Column: 4},
 		},
 		currentTokenStart: 1,
-		positionInBuffer:  4,
+		position:          4,
 	},
 	expectedLexer: &Lexer{
 		input:              "abcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: nil,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_ERROR,
+		currentToken: Token{
+			Type:  TOKEN_ERROR,
 			Value: "test message: 12",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+			Start: TokenPosition{Line: 0, Column: 1},
+			End:   TokenPosition{Line: 0, Column: 4},
 		},
 
 		currentTokenStart: 1,
-		positionInBuffer:  4,
+		position:          4,
 	},
 }
 
@@ -753,71 +751,71 @@ var skipWhitespaceTestCase_skipWhitespaceWithNewline = struct {
 	expectedCallCount: 0,
 	inputLexer: &Lexer{
 		input:              " \t\r\nabcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: nil,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 0},
+			Start: TokenPosition{Line: 0, Column: 0},
+			End:   TokenPosition{Line: 0, Column: 0},
 		},
 		currentTokenStart: 0,
-		positionInBuffer:  0,
+		position:          0,
 	},
 	expectedLexer: &Lexer{
 		input:              " \t\r\nabcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: nil,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "",
-			Start: lexertoken.TokenPosition{Line: 1, Column: 0},
-			End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+			Start: TokenPosition{Line: 1, Column: 0},
+			End:   TokenPosition{Line: 1, Column: 0},
 		},
 		currentTokenStart: 4,
-		positionInBuffer:  4,
+		position:          4,
 	},
 }
 
 var skipWhitespaceTestCase_EOF = struct {
 	name              string
 	expectedCallCount int
-	expectedToken     lexertoken.Token
+	expectedToken     Token
 	inputLexer        *Lexer
 	expectedLexer     *Lexer
 }{
 	name: "EOF",
-	expectedToken: lexertoken.Token{
-		Type:  lexertoken.TOKEN_EOF,
+	expectedToken: Token{
+		Type:  TOKEN_EOF,
 		Value: "abcde \n",
-		Start: lexertoken.TokenPosition{Line: 1, Column: 0},
-		End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+		Start: TokenPosition{Line: 1, Column: 0},
+		End:   TokenPosition{Line: 1, Column: 0},
 	},
 	inputLexer: &Lexer{
 		input:              "abcde \n",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: nil,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "abcde",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 0},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 5},
+			Start: TokenPosition{Line: 0, Column: 0},
+			End:   TokenPosition{Line: 0, Column: 5},
 		},
 		currentTokenStart: 0,
-		positionInBuffer:  5,
+		position:          5,
 	},
 	expectedLexer: &Lexer{
 		input:              "abcde \n",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: nil,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "",
-			Start: lexertoken.TokenPosition{Line: 1, Column: 0},
-			End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+			Start: TokenPosition{Line: 1, Column: 0},
+			End:   TokenPosition{Line: 1, Column: 0},
 		},
 		currentTokenStart: 7,
-		positionInBuffer:  7,
+		position:          7,
 	},
 }
 
@@ -861,30 +859,30 @@ var newlineTestCase = struct {
 	expectedCallCount: 0,
 	inputLexer: &Lexer{
 		input:              "abcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: mockLexingFunction,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "bcd",
-			Start: lexertoken.TokenPosition{Line: 0, Column: 1},
-			End:   lexertoken.TokenPosition{Line: 0, Column: 4},
+			Start: TokenPosition{Line: 0, Column: 1},
+			End:   TokenPosition{Line: 0, Column: 4},
 		},
 		currentTokenStart: 1,
-		positionInBuffer:  4,
+		position:          4,
 	},
 	expectedLexer: &Lexer{
 		input:              "abcde",
-		tokens:             make(chan lexertoken.Token, 5),
+		tokens:             make(chan Token, 5),
 		nextLexingFunction: mockLexingFunction,
-		currentToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_UNKNOWN,
+		currentToken: Token{
+			Type:  TOKEN_UNKNOWN,
 			Value: "bcd",
-			Start: lexertoken.TokenPosition{Line: 1, Column: 0},
-			End:   lexertoken.TokenPosition{Line: 1, Column: 0},
+			Start: TokenPosition{Line: 1, Column: 0},
+			End:   TokenPosition{Line: 1, Column: 0},
 		},
 
 		currentTokenStart: 1,
-		positionInBuffer:  4,
+		position:          4,
 	},
 }
 

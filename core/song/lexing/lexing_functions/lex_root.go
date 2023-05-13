@@ -1,12 +1,11 @@
 package lexingFunctions
 
 import (
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
+	"github.com/baptistemehat/go-leadsheet/core/song/lexing"
 )
 
 // LexRoot
-func LexRoot(lexer *lex.Lexer) lex.LexingFunction {
+func LexRoot(lexer *lexing.Lexer) lexing.LexingFunction {
 	// Skip whitespaces
 	lexer.SkipWhitespace()
 
@@ -14,16 +13,16 @@ func LexRoot(lexer *lex.Lexer) lex.LexingFunction {
 
 	switch nextRune {
 
-	case lexertoken.EOF:
+	case lexing.RUNE_EOF:
 		// TODO : normalise error messages
 		lexer.Errorf("unexpected EOF while parsing root ")
 		return nil
 
-	case lexertoken.ERROR:
+	case lexing.RUNE_ERROR:
 		lexer.Errorf("unexpected character found")
 		return nil
 
-	case lexertoken.LEFT_BRACE:
+	case lexing.RUNE_LEFT_BRACE:
 		return LexLeftBrace
 
 	default:

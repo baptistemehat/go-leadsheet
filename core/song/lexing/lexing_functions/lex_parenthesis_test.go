@@ -3,15 +3,14 @@ package lexingFunctions
 import (
 	"testing"
 
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lex"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexer/lexertoken"
+	"github.com/baptistemehat/go-leadsheet/core/song/lexing"
 )
 
 type testCase struct {
 	Name          string
 	Input         string
-	LexingFunc    lex.LexingFunction
-	ExpectedToken lexertoken.Token
+	LexingFunc    lexing.LexingFunction
+	ExpectedToken lexing.Token
 }
 
 var testCaseArray = []testCase{
@@ -19,8 +18,8 @@ var testCaseArray = []testCase{
 		Name:       "Key",
 		Input:      "Title: Hotel California\n",
 		LexingFunc: LexPropertyKey,
-		ExpectedToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_PROPERTY_KEY,
+		ExpectedToken: lexing.Token{
+			Type:  lexing.TOKEN_PROPERTY_KEY,
 			Value: "Title",
 		},
 	},
@@ -28,8 +27,8 @@ var testCaseArray = []testCase{
 		Name:       "Key_EOF",
 		Input:      "Title",
 		LexingFunc: LexPropertyKey,
-		ExpectedToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_EOF,
+		ExpectedToken: lexing.Token{
+			Type:  lexing.TOKEN_EOF,
 			Value: "Title",
 		},
 	},
@@ -37,8 +36,8 @@ var testCaseArray = []testCase{
 		Name:       "Value",
 		Input:      "Hotel California\n",
 		LexingFunc: LexPropertyValue,
-		ExpectedToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_PROPERTY_VALUE,
+		ExpectedToken: lexing.Token{
+			Type:  lexing.TOKEN_PROPERTY_VALUE,
 			Value: "Hotel California",
 		},
 	},
@@ -46,8 +45,8 @@ var testCaseArray = []testCase{
 		Name:       "Value_EOF",
 		Input:      "Hotel California",
 		LexingFunc: LexPropertyValue,
-		ExpectedToken: lexertoken.Token{
-			Type:  lexertoken.TOKEN_EOF,
+		ExpectedToken: lexing.Token{
+			Type:  lexing.TOKEN_EOF,
 			Value: "Hotel California",
 		},
 	},
@@ -57,7 +56,7 @@ func TestLexProperty(t *testing.T) {
 
 	for _, testCase := range testCaseArray {
 		t.Run(testCase.Name, func(t *testing.T) {
-			lexer := lex.NewLexer(testCase.Input, LexRoot)
+			lexer := lexing.NewLexer(testCase.Input, LexRoot)
 			testCase.LexingFunc(lexer)
 
 			//if actualToken := <-lexer.Tokens; actualToken != testCase.ExpectedToken {
@@ -73,15 +72,15 @@ func TestLexProperty(t *testing.T) {
 // func TestLexPropertyFull(t *testing.T) {
 // 	l := lexer.NewLexer(testInput)
 
-// 	if token := l.NextToken(); token.Type != lexertoken.TOKEN_PROPERTY_KEY {
+// 	if token := l.NextToken(); lexing.Type != lexing.TOKEN_PROPERTY_KEY {
 // 		t.Errorf("Property key")
 // 	}
 
-// 	if token := l.NextToken(); token.Type != lexertoken.TOKEN_COLUMN {
+// 	if token := l.NextToken(); lexing.Type != lexing.TOKEN_COLUMN {
 // 		t.Errorf("Column")
 // 	}
 
-// 	if token := l.NextToken(); token.Type != lexertoken.TOKEN_PROPERTY_VALUE {
+// 	if token := l.NextToken(); lexing.Type != lexing.TOKEN_PROPERTY_VALUE {
 // 		t.Errorf("Property value")
 // 	}
 // }
