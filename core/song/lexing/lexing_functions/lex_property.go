@@ -15,11 +15,15 @@ func LexPropertyKey(lexer *lexing.Lexer) lexing.LexingFunction {
 
 		case lexing.RUNE_EOF:
 			// TODO : normalise error messages
-			lexer.Errorf("unexpected EOF while parsing property key")
+			lexer.Errorf(lexing.LEXER_ERROR_UNEXPECTED_EOF)
 			return nil
 
 		case lexing.RUNE_ERROR:
-			lexer.Errorf("unexpected character found")
+			lexer.Errorf(lexing.LEXER_ERROR_UNEXPECTED_RUNE)
+			return nil
+
+		case lexing.RUNE_NEWLINE:
+			lexer.Errorf(lexing.LEXER_ERROR_UNEXPECTED_NEWLINE)
 			return nil
 
 		case lexing.RUNE_COLUMN:
@@ -40,11 +44,11 @@ func LexPropertyValue(lexer *lexing.Lexer) lexing.LexingFunction {
 
 		case lexing.RUNE_EOF:
 			// TODO : normalise error messages
-			lexer.Errorf("unexpected EOF while parsing property value")
+			lexer.Errorf(lexing.LEXER_ERROR_UNEXPECTED_EOF)
 			return nil
 
 		case lexing.RUNE_ERROR:
-			lexer.Errorf("unexpected character found")
+			lexer.Errorf(lexing.LEXER_ERROR_UNEXPECTED_RUNE)
 			return nil
 
 		case lexing.RUNE_NEWLINE:

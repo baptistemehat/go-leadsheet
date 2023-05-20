@@ -4,83 +4,37 @@ import (
 	"testing"
 
 	"github.com/baptistemehat/go-leadsheet/core/song/lexing"
+	"github.com/stretchr/testify/assert"
 )
 
-type testCase struct {
-	Name          string
-	Input         string
-	LexingFunc    lexing.LexingFunction
-	ExpectedToken lexing.Token
-}
+func TestLexLeftParenthesis(t *testing.T) {
 
-var testCaseArray = []testCase{
-	{
-		Name:       "Key",
-		Input:      "Title: Hotel California\n",
-		LexingFunc: LexPropertyKey,
-		ExpectedToken: lexing.Token{
-			Type:  lexing.TOKEN_PROPERTY_KEY,
-			Value: "Title",
-		},
-	},
-	{
-		Name:       "Key_EOF",
-		Input:      "Title",
-		LexingFunc: LexPropertyKey,
-		ExpectedToken: lexing.Token{
-			Type:  lexing.TOKEN_EOF,
-			Value: "Title",
-		},
-	},
-	{
-		Name:       "Value",
-		Input:      "Hotel California\n",
-		LexingFunc: LexPropertyValue,
-		ExpectedToken: lexing.Token{
-			Type:  lexing.TOKEN_PROPERTY_VALUE,
-			Value: "Hotel California",
-		},
-	},
-	{
-		Name:       "Value_EOF",
-		Input:      "Hotel California",
-		LexingFunc: LexPropertyValue,
-		ExpectedToken: lexing.Token{
-			Type:  lexing.TOKEN_EOF,
-			Value: "Hotel California",
-		},
-	},
-}
-
-func TestLexProperty(t *testing.T) {
-
-	for _, testCase := range testCaseArray {
-		t.Run(testCase.Name, func(t *testing.T) {
-			lexer := lexing.NewLexer(testCase.Input, LexRoot)
-			testCase.LexingFunc(lexer)
-
-			//if actualToken := <-lexer.Tokens; actualToken != testCase.ExpectedToken {
-			//	actualTokenJson, _ := json.Marshal(actualToken)
-			//	expectedTokenJson, _ := json.Marshal(testCase.ExpectedToken)
-			//	t.Errorf("Expected: %s, Got: %s", string(expectedTokenJson), string(actualTokenJson))
-			//}
-		})
+	expectedToken := lexing.Token{
+		Type:  lexing.TOKEN_LEFT_PARENTHESIS,
+		Value: string(lexing.RUNE_LEFT_PARENTHESIS),
+		Start: lexing.TokenPosition{Line: 0, Column: 0},
+		End:   lexing.TokenPosition{Line: 0, Column: 1},
 	}
+
+	lexer := lexing.NewLexer(string(lexing.RUNE_LEFT_PARENTHESIS), LexLeftParenthesis)
+
+	actualToken := lexer.NextToken()
+
+	assert.Equal(t, expectedToken, actualToken)
 }
 
-// TODO : this is a behavioural test, shoud not be here
-// func TestLexPropertyFull(t *testing.T) {
-// 	l := lexer.NewLexer(testInput)
+func TestLexRightParenthesis(t *testing.T) {
 
-// 	if token := l.NextToken(); lexing.Type != lexing.TOKEN_PROPERTY_KEY {
-// 		t.Errorf("Property key")
-// 	}
+	expectedToken := lexing.Token{
+		Type:  lexing.TOKEN_RIGHT_PARENTHESIS,
+		Value: string(lexing.RUNE_RIGHT_PARENTHESIS),
+		Start: lexing.TokenPosition{Line: 0, Column: 0},
+		End:   lexing.TokenPosition{Line: 0, Column: 1},
+	}
 
-// 	if token := l.NextToken(); lexing.Type != lexing.TOKEN_COLUMN {
-// 		t.Errorf("Column")
-// 	}
+	lexer := lexing.NewLexer(string(lexing.RUNE_RIGHT_PARENTHESIS), LexRightParenthesis)
 
-// 	if token := l.NextToken(); lexing.Type != lexing.TOKEN_PROPERTY_VALUE {
-// 		t.Errorf("Property value")
-// 	}
-// }
+	actualToken := lexer.NextToken()
+
+	assert.Equal(t, expectedToken, actualToken)
+}
