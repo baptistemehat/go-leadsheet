@@ -15,12 +15,11 @@ func LexSectionName(lexer *lexing.Lexer) lexing.LexingFunction {
 		switch nextRune {
 
 		case lexing.RUNE_EOF:
-			// TODO : normalise error messages
-			lexer.Errorf("unexpected EOF while parsing section name: position")
+			lexer.Errorf(lexing.LEXER_ERROR_UNEXPECTED_EOF)
 			return nil
 
 		case lexing.RUNE_ERROR:
-			lexer.Errorf("unexpected character found")
+			lexer.Errorf(lexing.LEXER_ERROR_UNEXPECTED_RUNE)
 			return nil
 
 		case lexing.RUNE_RIGHT_BRACE:
@@ -28,7 +27,6 @@ func LexSectionName(lexer *lexing.Lexer) lexing.LexingFunction {
 			return LexRightBrace
 		}
 
-		// TODO : rename
 		lexer.MoveAfterRune(nextRune)
 	}
 }

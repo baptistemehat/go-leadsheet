@@ -15,7 +15,7 @@ func LexSection(lexer *lexing.Lexer) lexing.LexingFunction {
 		return nil
 
 	case lexing.RUNE_ERROR:
-		lexer.Errorf("unexpected character found")
+		lexer.Errorf(lexing.LEXER_ERROR_UNEXPECTED_RUNE)
 		return nil
 
 	case lexing.RUNE_LEFT_BRACE:
