@@ -1,3 +1,5 @@
 core/main
 core/**.pdf
 core/latex/tmp
+tmp/
+**.log

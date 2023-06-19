@@ -1,11 +1,12 @@
 package api
 
 import (
-	"core/httpResponse"
-	"core/pdfGenerator"
 	"encoding/json"
-	"log"
 	"net/http"
+
+	"github.com/baptistemehat/go-leadsheet/core/common/logger"
+	"github.com/baptistemehat/go-leadsheet/core/httpResponse"
+	"github.com/baptistemehat/go-leadsheet/core/pdfGenerator"
 
 	"github.com/gorilla/mux"
 )
@@ -15,7 +16,7 @@ type RestApi struct {
 	endpoints    map[string]func(http.ResponseWriter, *http.Request)
 }
 
-// NewRestApi returns a new RestApi instance
+// NewRestApi creates a new RestApi
 func NewRestApi(p *pdfGenerator.PdfGenerator) (*RestApi, error) {
 
 	restApi := &RestApi{
@@ -34,22 +35,24 @@ func NewRestApi(p *pdfGenerator.PdfGenerator) (*RestApi, error) {
 func (restApi *RestApi) ListenAndServe(addr string) {
 	r := mux.NewRouter()
 
+	// associate endpoint with handler function
 	for route, handler := range restApi.endpoints {
 		r.HandleFunc(route, handler)
 	}
 
+	// start server
 	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	logger.Logger.Fatal().Msgf("%s", http.ListenAndServe(addr, nil))
 }
 
 // **********************
 //      ENDPOINTS
 // **********************
 
-// health
+// health handles /health endpoint
 func (ri *RestApi) health(w http.ResponseWriter, r *http.Request) {
 
-	log.Printf("Received API request: health")
+	logger.Logger.Info().Msgf("received API request: %s %s %s", r.Method, r.URL.Path, r.URL.RawQuery)
 
 	switch r.Method {
 
@@ -62,10 +65,10 @@ func (ri *RestApi) health(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// song
+// song handles /song endpoint
 func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 
-	log.Printf("Received API request: song")
+	logger.Logger.Info().Msgf("received API request: %s %s %s", r.Method, r.URL.Path, r.URL.RawQuery)
 
 	switch r.Method {
 
@@ -90,6 +93,7 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 		switch intputType {
 		case "text":
 
+			// TODO : remove this feature since metadata are passed in leadsheet
 			// TODO : create a Schema in a json file ? Shared file with UI
 			type Msg struct {
 				Title     string `json:"title"`
@@ -105,6 +109,7 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			// TODO : ? add channels to transmit error
 			go restApi.pdfGenerator.GeneratePdfFromBuffer(msg.Leadsheet)
 			httpResponse.Accepted(w)
 
@@ -121,10 +126,10 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// status
+// status handles /status endpoint
 func (restApi *RestApi) status(w http.ResponseWriter, r *http.Request) {
 
-	log.Printf("Received API request: status")
+	logger.Logger.Info().Msgf("received API request: %s %s %s", r.Method, r.URL.Path, r.URL.RawQuery)
 
 	switch r.Method {
 

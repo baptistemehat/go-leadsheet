@@ -1,13 +1,14 @@
 package main
 
-import (
-	"log"
-)
+import "github.com/baptistemehat/go-leadsheet/core/common/logger"
 
 func main() {
+
+	logger.Init()
+
 	app, err := NewApp()
 	if err != nil {
-		log.Fatal(err)
+		logger.Logger.Fatal().Msgf("%s", err)
 	}
 
 	app.Run()
