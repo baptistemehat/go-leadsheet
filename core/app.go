@@ -6,7 +6,7 @@ import (
 	"github.com/baptistemehat/go-leadsheet/core/config"
 	"github.com/baptistemehat/go-leadsheet/core/pdfGenerator"
 	"github.com/baptistemehat/go-leadsheet/core/song/formatter"
-	"github.com/baptistemehat/go-leadsheet/core/song/parser"
+	"github.com/baptistemehat/go-leadsheet/core/song/parsing"
 )
 
 // TODO : make this path relative to the app
@@ -20,7 +20,7 @@ type App struct {
 func NewApp() (*App, error) {
 
 	builder := pdfGenerator.Builder{
-		Parser:    parser.InlineChordParser{},
+		Parser:    parsing.InlineChordParser{},
 		Formatter: &formatter.LatexSongFormatter{},
 	}
 
