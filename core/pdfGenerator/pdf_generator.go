@@ -3,6 +3,8 @@ package pdfGenerator
 import (
 	"os"
 	"os/exec"
+	"strconv"
+	"time"
 
 	"github.com/baptistemehat/go-leadsheet/core/common/logger"
 	"github.com/baptistemehat/go-leadsheet/core/config"
@@ -109,10 +111,13 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 	// TODO : these folders should be configurable
 
 	// Write input to file
-	if err := WriteStringToFile(buffer, pg.config.Folder+"/leadsheet.txt"); err != nil {
+	filename := strconv.FormatInt(time.Now().Unix(), 10) + ".txt"
+	if err := WriteStringToFile(buffer, pg.config.Storage+"/"+filename); err != nil {
 		pg.status = StatusError
 		logger.Logger.Info().Msgf("%s", err)
 		return err
+	} else {
+		logger.Logger.Debug().Msgf("Song saved to file %s", filename)
 	}
 
 	// Parse input
