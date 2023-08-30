@@ -1,5 +1,7 @@
 package model
 
+import "strings"
+
 // ChordIndex
 type ChordIndex struct {
 	Index uint8 `json:"index"`
@@ -15,6 +17,7 @@ type Line struct {
 // NewLine
 func NewLine() Line {
 	return Line{
+		Chords: []ChordIndex{},
 		Lyrics: "",
 	}
 }
@@ -70,7 +73,8 @@ func (line *Line) IsLyricsOnly() bool {
 
 // IsChordsOnly
 func (line *Line) IsChordsOnly() bool {
-	return len(line.Chords) > 0 && len(line.Lyrics) == 0
+	// TODO: also return true if lyrics are only whitespaces
+	return len(line.Chords) > 0 && len(strings.TrimSpace(line.Lyrics)) == 0
 }
 
 func (line *Line) IsEmpty() bool {

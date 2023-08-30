@@ -28,25 +28,23 @@ func TestGeneratePdfFromBuffer(t *testing.T) {
 	}
 
 	err = pdfGenerator.GeneratePdfFromBuffer(`
-
-Title: Hotel California
-Composer: Eagles
+Title: Shallow
+Composer: Lady Gaga & Bradley Cooper
 Capo: 0
-Key: Bm
+Key: G
+
+{Intro}
+[Em7] [D/F#] [G] [G]
+[C] [C] [G] [D]
+[Em7] [D/F#] [G] [G]
 
 {Verse}
+Tell me somethin', girl
+Are you happy in this modern world?
 
-[Am] On a dark desert highway,[E7] cool wind in my hair
-[G] Warm smell of colitas [D] rising up through the air
-[F] Up ahead in the distance,[C] I saw a shimmering light
-[Dm] My head grew heavy and my sight grew dim,[E7] I had to stop for the night
-{Chorus}
-
-[F] Welcome to the Hotel Califo[C]rnia.
-Such a [E7]lovely place, (such a lovely place), such a [Am]lovely face
-[F]Plenty of room at the Hotel Cali[C]fornia
-Any [Dm]time of year, (any time of year) You can [E7]find it here
-
+Or do you need more?
+Is there somethin' else you're searchin' for?
+	
 	`)
 
 	if err != nil {

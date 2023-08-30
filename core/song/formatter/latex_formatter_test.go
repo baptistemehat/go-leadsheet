@@ -16,6 +16,15 @@ var latexTestCases []latexTestCase = []latexTestCase{
 	{model.NewChord(model.E, model.Major, model.MinorSeventh, []uint8{}, model.Gs), "\\chord{E7/G#}"},
 }
 
+func TestLatexEscape(t *testing.T) {
+	input := "abc&efg%hij$klm#nop_qrs{tuv}wxy~zAB^CDE\\FGH"
+	expected := "abc\\& efg\\% hij\\$ klm\\# nop\\_ qrs\\{ tuv\\} wxy\\textasciitilde zAB\\textasciicircum CDE\\textbackslash FGH"
+
+	if actual := LatexEscape(input); actual != expected {
+		t.Errorf("Actual: '%s' - Expected: '%s'", actual, expected)
+	}
+}
+
 // TODO : add error cases
 
 func TestFormatChord(t *testing.T) {
@@ -54,7 +63,7 @@ func TestFormatLine_ChordsOnly(t *testing.T) {
 func TestFormatLine_LyricsAndChords(t *testing.T) {
 
 	line := model.NewLine()
-	line.SetLyrics("Somewhere over the rainbow")
+	line.AppendLyrics("Somewhere over the rainbow")
 	line.AddChord(model.NewChord(model.G, model.Major, model.SeventhNone, []uint8{}, model.G), 0)
 	line.AddChord(model.NewChord(model.B, model.Minor, model.SeventhNone, []uint8{}, model.B), 10)
 	line.AddChord(model.NewChord(model.C, model.Major, model.SeventhNone, []uint8{}, model.C), 25)
@@ -74,7 +83,7 @@ func TestFormatSection(t *testing.T) {
 	section.SetName("Verse")
 
 	line := model.NewLine()
-	line.SetLyrics("Somewhere over the rainbow")
+	line.AppendLyrics("Somewhere over the rainbow")
 	line.AddChord(model.NewChord(model.G, model.Major, model.SeventhNone, []uint8{}, model.G), 0)
 	line.AddChord(model.NewChord(model.B, model.Minor, model.SeventhNone, []uint8{}, model.B), 10)
 	line.AddChord(model.NewChord(model.C, model.Major, model.SeventhNone, []uint8{}, model.C), 25)
@@ -111,7 +120,7 @@ func TestFormatSong(t *testing.T) {
 	section.SetName("Verse")
 
 	line := model.NewLine()
-	line.SetLyrics("Somewhere over the rainbow")
+	line.AppendLyrics("Somewhere over the rainbow")
 	line.AddChord(model.NewChord(model.G, model.Major, model.SeventhNone, []uint8{}, model.G), 0)
 	line.AddChord(model.NewChord(model.B, model.Minor, model.SeventhNone, []uint8{}, model.B), 10)
 	line.AddChord(model.NewChord(model.C, model.Major, model.SeventhNone, []uint8{}, model.C), 25)
