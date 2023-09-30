@@ -35,22 +35,22 @@
 
 % VERSE TYPE TEMPLATES ================================
 % Intro template
-\defineversetypetemplate{Intro}{
+\defineversetypetemplate{BoldName}{
     \vspace{0.5em}
-    \textbf{Intro: }
+    \textbf{\verselabel: }
 }{
     \vspace{1em}
 }
 
 
 % Verse template
-\defineversetypetemplate{Verse}{
+\defineversetypetemplate{Unnamed}{
     \setlength{\parindent}{0em}
 }{}
 
 
 % Chorus template
-\defineversetypetemplate{Chorus}{
+\defineversetypetemplate{SideName}{
 
     \mdframed[
         %innertopmargin=10pt,
@@ -65,7 +65,7 @@
         linecolor=gray,
         ]
 
-    \llap{\color{gray} \rotatebox{45}{\textbf{Chorus}} \color{black}\hspace{1.5em}}%
+    \llap{\color{gray} \rotatebox{45}{\textbf{\verselabel}} \color{black}\hspace{1.5em}}%
     \vspace*{-3em}
 }{
     \vspace*{-1\baselineskip}
@@ -119,12 +119,12 @@
 
 
 
-\newversetype*{Intro}[template=Intro]
-\newversetype*{Verse}[template=Verse]
-\newversetype*{Chorus}[template=Chorus]
-\newversetype*{Bridge}[template=Bridge]
-\newversetype*{Solo}[template=Solo]
-\newversetype*{Outro}[template=Outro]
+\newversetype{Intro}[template=BoldName, name=Intro, after-label={}]
+\newversetype{Verse}[template=Unnamed, name=Verse, after-label={}]
+\newversetype{Chorus}[template=SideName, name=Chorus, after-label={}]
+\newversetype{Bridge}[template=SideName, name=Bridge, after-label={}]
+\newversetype{Solo}[template=BoldName, name=Solo, after-label={}]
+\newversetype{Outro}[template=BoldName, name=Outro, after-label={}]
 
 
 \setchords{

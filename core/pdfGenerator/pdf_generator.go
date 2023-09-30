@@ -111,10 +111,10 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 	// TODO : these folders should be configurable
 
 	// Write input to file
-	filename := strconv.FormatInt(time.Now().Unix(), 10) + ".txt"
+	filename := strconv.FormatInt(time.Now().UnixMilli(), 10) + ".txt"
 	if err := WriteStringToFile(buffer, pg.config.Storage+"/"+filename); err != nil {
 		pg.status = StatusError
-		logger.Logger.Info().Msgf("%s", err)
+		logger.Logger.Err(err).Msg("Failed to save input to file: ")
 		return err
 	} else {
 		logger.Logger.Debug().Msgf("Song saved to file %s", filename)
@@ -124,7 +124,7 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 	song, err := pg.builder.Parser.Parse(buffer)
 	if err != nil {
 		pg.status = StatusError
-		logger.Logger.Info().Msgf("%s", err)
+		logger.Logger.Err(err).Msg("Failed to parse input: ")
 		return err
 	}
 
@@ -132,14 +132,14 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 	formattedSong, err := song.Format(pg.builder.Formatter)
 	if err != nil {
 		pg.status = StatusError
-		logger.Logger.Info().Msgf("%s", err)
+		logger.Logger.Err(err).Msg("Failed to format song: ")
 		return err
 	}
 
 	// Write formatted song
 	if err := WriteStringToFile(formattedSong, pg.config.Folder+"/tmp/songs/leadsheet.tex"); err != nil {
 		pg.status = StatusError
-		logger.Logger.Info().Msgf("%s", err)
+		logger.Logger.Err(err).Msg("Failed to write formatted song to file: ")
 		return err
 	}
 	//defer os.Remove("latex/tmp/songs/leadsheet.tex")
@@ -147,7 +147,7 @@ func (pg *PdfGenerator) GeneratePdfFromBuffer(buffer string) error {
 	// Compile latex
 	if err := pg.tex2pdf(); err != nil {
 		pg.status = StatusError
-		logger.Logger.Info().Msgf("tex2pdf: %s", err)
+		logger.Logger.Err(err).Msg("Failed to compile LateX, tex2pdf: ")
 		return err
 	}
 

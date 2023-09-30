@@ -6,7 +6,7 @@ import (
 
 	"github.com/baptistemehat/go-leadsheet/core/common/logger"
 	"github.com/baptistemehat/go-leadsheet/core/song/lexing"
-	"github.com/baptistemehat/go-leadsheet/core/song/lexing/lexing_functions"
+	lexingFunctions "github.com/baptistemehat/go-leadsheet/core/song/lexing/lexing_functions"
 	"github.com/baptistemehat/go-leadsheet/core/song/model"
 )
 
@@ -59,6 +59,7 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 			if len(section.Name) > 0 {
 
 				// stop section parsing, add section to song
+				section = section.TrimEmptyLines()
 				song.AddSection(section)
 			}
 
@@ -69,7 +70,9 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 			propertyKey = tokenValue
 
 		case lexing.TOKEN_PROPERTY_VALUE:
-			song.Properties.SetProperty(propertyKey, tokenValue)
+			if err := song.Properties.SetProperty(propertyKey, tokenValue); err != nil {
+				return model.NewSong(), err
+			}
 			propertyKey = ""
 
 		case lexing.TOKEN_SECTION_NAME:
@@ -78,6 +81,7 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 			if len(section.Name) > 0 {
 
 				// stop section parsing, add section to song
+				section = section.TrimEmptyLines()
 				song.AddSection(section)
 			}
 
@@ -93,11 +97,11 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 		case lexing.TOKEN_NEWLINE:
 
 			// if a line is being parsed
-			if !line.IsEmpty() {
+			//if !line.IsEmpty() {
 
-				// stop lyrics parsing, ie add lyrics to section
-				section.AddLine(line)
-			}
+			// stop lyrics parsing, ie add lyrics to section
+			section.AddLine(line)
+			//}
 
 			// clear line for future parsing
 			line.Clear()

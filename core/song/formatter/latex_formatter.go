@@ -2,11 +2,39 @@ package formatter
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/baptistemehat/go-leadsheet/core/song/model"
+	"golang.org/x/exp/slices"
 )
 
 type LatexSongFormatter struct {
+}
+
+var LATEX_ESCAPE_RUNES = map[rune]string{
+	'&':  "\\&",
+	'%':  "\\%",
+	'$':  "\\$",
+	'#':  "\\#",
+	'_':  "\\_",
+	'{':  "\\{",
+	'}':  "\\}",
+	'~':  "\\textasciitilde",
+	'^':  "\\textasciicircum",
+	'\\': "\\textbackslash",
+}
+
+// TODO: test this function
+func LatexEscape(latexString string) string {
+	result := ""
+	for _, r := range latexString {
+		if escapeSequence, found := LATEX_ESCAPE_RUNES[r]; found {
+			result += escapeSequence + " "
+		} else {
+			result += string(r)
+		}
+	}
+	return result
 }
 
 // FormatChord
@@ -32,10 +60,34 @@ func (f *LatexSongFormatter) FormatLine(line *model.Line) (string, error) {
 
 	// Latex formatting : "\chord{Am} On a dark desert highway,\chord{E7} cool wind in my hair \\"
 
-	result := line.Lyrics
+	// TODO: create a sort of proxy that would automatically apply escaping when getting lyrics, title, ...
+	result := LatexEscape(line.Lyrics)
 
-	// if line contains chords
-	if !line.IsLyricsOnly() {
+	// TODO: if only chords, special formatting
+	// TODO: add test for this case
+	if line.IsEmpty() {
+		result = "~"
+	} else if line.IsChordsOnly() {
+
+		// TODO: only add \n if line is after a title
+		result = "\\doublebar"
+
+		// foreach chord in line
+		for i, chordIndex := range line.Chords {
+
+			if i > 0 {
+				result += " \\normalbar"
+			}
+
+			// TODO : handle all errors
+			// TODO : Create a dedicated formatter or formatting function here ?
+
+			chordString, _ := chordIndex.Chord.String()
+			result += fmt.Sprintf(" ~\\writechord{%s}", chordString)
+		}
+		result += " \\doublebar"
+
+	} else if !line.IsLyricsOnly() { // if line contains chords
 
 		// tracks the cumulated length of chord strings
 		chordsLength := uint8(0)
@@ -58,10 +110,47 @@ func (f *LatexSongFormatter) FormatLine(line *model.Line) (string, error) {
 	return result, nil
 }
 
+// cf. core/latex/static/config.tex
+var DEFAULT_SECTION_NAMES = []string{
+	"Intro",
+	"Verse",
+	"Chorus",
+	"Bridge",
+	"Solo",
+	"Outro",
+}
+
+var userDefinedSectionNames []string
+
+func AppendToFile(buffer, fileName string) error {
+	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	//TODO handle errors here
+	file.WriteString(buffer)
+
+	return nil
+}
+
 // FormatSection
 func (f *LatexSongFormatter) FormatSection(section *model.Section) (string, error) {
 
 	// Latex formatting : \begin{Verse} ... \end{Verse}
+
+	if !slices.Contains(DEFAULT_SECTION_NAMES, section.Name) && !slices.Contains(userDefinedSectionNames, section.Name) {
+		// TODO : create a section type
+		// TODO : write a custom file, imported by config.tex which woulddefine new section types
+		// Write input to file
+		buffer := fmt.Sprintf("\\newversetype{%s}[template=SideName, after-label={}, name={%s}]", LatexEscape(section.Name), LatexEscape(section.Name))
+		// TODO : make WriteStringToFile a util function (and make it append to file)
+		if err := AppendToFile(buffer, "latex/tmp/user_config.tex"); err != nil {
+			//TODO error handling
+		}
+		userDefinedSectionNames = append(userDefinedSectionNames, section.Name)
+	}
 
 	// \begin{}
 	result := fmt.Sprintf("\\begin{%s}\n", section.Name)
@@ -85,10 +174,10 @@ func (f *LatexSongFormatter) FormatSongProperties(sp *model.SongProperties) (str
 	// Temporary implementation
 
 	result := "{\n"
-	result += fmt.Sprintf("title = {%s},\n", sp.Title)
-	result += fmt.Sprintf("composer = {%s},\n", sp.Composer)
+	result += fmt.Sprintf("title = {%s},\n", LatexEscape(sp.Title))
+	result += fmt.Sprintf("composer = {%s},\n", LatexEscape(sp.Composer))
 	result += fmt.Sprintf("capo = {%d},\n", sp.Capo)
-	result += fmt.Sprintf("key = {%s},\n", sp.Key)
+	result += fmt.Sprintf("key = {%s},\n", LatexEscape(sp.Key))
 	result += "}"
 
 	return result, nil
@@ -96,6 +185,15 @@ func (f *LatexSongFormatter) FormatSongProperties(sp *model.SongProperties) (str
 
 // FormatSong
 func (f *LatexSongFormatter) FormatSong(song *model.Song) (string, error) {
+
+	// TODO centralize filepath of custom config file
+	file, err := os.Create("latex/tmp/user_config.tex")
+	if err != nil {
+		return "", err
+	}
+	file.Close()
+
+	userDefinedSectionNames = []string{}
 
 	// Latex formatting : \begin{song} ... \end{song}
 

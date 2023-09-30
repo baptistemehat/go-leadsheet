@@ -30,6 +30,28 @@ func (section *Section) Clear() {
 	section.Lines = []Line{}
 }
 
+func (section *Section) TrimEmptyLines() Section {
+	trimedSection := NewSection()
+	trimedSection.SetName(section.Name)
+
+	isPreviousLineEmpty := false
+	isFirstNonEmptyLine := true
+
+	for _, line := range section.Lines {
+
+		if !line.IsEmpty() {
+			if isPreviousLineEmpty && !isFirstNonEmptyLine {
+				trimedSection.AddLine(NewLine())
+			}
+			trimedSection.AddLine(line)
+			isFirstNonEmptyLine = false
+		}
+
+		isPreviousLineEmpty = line.IsEmpty()
+	}
+	return trimedSection
+}
+
 // Format
 func (section *Section) Format(f Formatter) (string, error) {
 	return f.FormatSection(section)

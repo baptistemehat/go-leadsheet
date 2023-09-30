@@ -23,6 +23,7 @@ Key: Bm
    {Verse}
 
 [Am] On a dark desert highway,[E7] cool wind in my hair
+
 [G] Warm smell of colitas [D] rising up through the air
 [F] Up ahead in the distance,[C] I saw a shimmering light
 [Dm] My head grew heavy and my sight grew dim,[E7] I had to stop for the night
