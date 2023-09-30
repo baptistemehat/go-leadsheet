@@ -70,7 +70,9 @@ func (p InlineChordParser) Parse(input string) (model.Song, error) {
 			propertyKey = tokenValue
 
 		case lexing.TOKEN_PROPERTY_VALUE:
-			song.Properties.SetProperty(propertyKey, tokenValue)
+			if err := song.Properties.SetProperty(propertyKey, tokenValue); err != nil {
+				return model.NewSong(), err
+			}
 			propertyKey = ""
 
 		case lexing.TOKEN_SECTION_NAME:

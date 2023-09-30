@@ -2,7 +2,10 @@ package model
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
+
+	"github.com/baptistemehat/go-leadsheet/core/common/logger"
 )
 
 // TODO : replace by an actual key-value pair ? (string, string)
@@ -23,6 +26,8 @@ func (sp *SongProperties) Format(f Formatter) (string, error) {
 func (sp *SongProperties) SetProperty(name string, value interface{}) error {
 	nameToLower := strings.ToLower(name)
 
+	logger.Logger.Debug().Msgf("received new token: %s, %s", name, value)
+
 	switch nameToLower {
 	case "title":
 		if title, ok := value.(string); !ok {
@@ -39,7 +44,13 @@ func (sp *SongProperties) SetProperty(name string, value interface{}) error {
 		}
 
 	case "capo":
-		if capo, ok := value.(int); !ok {
+
+		capoString, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("value '%s' is not suitable for capo", value)
+		}
+
+		if capo, err := strconv.Atoi(capoString); err != nil {
 			return fmt.Errorf("value '%s' is not suitable for capo", value)
 		} else {
 			sp.Capo = capo

@@ -144,7 +144,7 @@ func (f *LatexSongFormatter) FormatSection(section *model.Section) (string, erro
 		// TODO : create a section type
 		// TODO : write a custom file, imported by config.tex which woulddefine new section types
 		// Write input to file
-		buffer := fmt.Sprintf("\\newversetype{%s}[template=BoldName, after-label={}, name={%s}]", LatexEscape(section.Name), LatexEscape(section.Name))
+		buffer := fmt.Sprintf("\\newversetype{%s}[template=SideName, after-label={}, name={%s}]", LatexEscape(section.Name), LatexEscape(section.Name))
 		// TODO : make WriteStringToFile a util function (and make it append to file)
 		if err := AppendToFile(buffer, "latex/tmp/user_config.tex"); err != nil {
 			//TODO error handling

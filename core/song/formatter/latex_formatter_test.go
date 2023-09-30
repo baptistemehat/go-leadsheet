@@ -102,7 +102,26 @@ func TestFormatSection(t *testing.T) {
 }
 
 func TestFormatSongProperties(t *testing.T) {
-	// TODO
+	songProperties := model.SongProperties{
+		Title:    "Somewhere over the rainbow",
+		Composer: "Israel Kamakawiwo'ole",
+		Capo:     5,
+		Key:      "G",
+	}
+
+	expectedString := "{\n" +
+		"title = {Somewhere over the rainbow},\n" +
+		"composer = {Israel Kamakawiwo'ole},\n" +
+		"capo = {5},\n" +
+		"key = {G},\n" +
+		"}"
+
+	f := LatexSongFormatter{}
+
+	if actual, _ := f.FormatSongProperties(&songProperties); actual != expectedString {
+		t.Errorf("Actual: '%s' - Expected: '%s'", actual, expectedString)
+	}
+
 }
 
 func TestFormatSong(t *testing.T) {
