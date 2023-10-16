@@ -11,6 +11,7 @@ import (
 
 func main() {
 
+	// Input flags
 	var configPath string
 	flag.StringVar(&configPath, "c", "", "Path to config.yaml file")
 
