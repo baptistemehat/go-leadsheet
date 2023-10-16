@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/baptistemehat/go-leadsheet/core/common/logger"
+	"github.com/rs/zerolog"
 )
-
-const DEFAULT_CONFIG_FILE string = ""
 
 func main() {
 
@@ -21,12 +21,13 @@ func main() {
 	}
 	flag.Parse()
 
+	// TODO create a Flag struct to store all input params and handle usage
 	if configPath == "" {
 		flag.Usage()
-		return
+		os.Exit(1)
 	}
 
-	logger.Init()
+	logger.Init(zerolog.DebugLevel)
 
 	app, err := NewApp(configPath)
 	if err != nil {

@@ -93,11 +93,8 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 		switch intputType {
 		case "text":
 
-			// TODO : remove this feature since metadata are passed in leadsheet
-			// TODO : create a Schema in a json file ? Shared file with UI
+			// TODO create a Schema in a json file, shared file with UI
 			type Msg struct {
-				Title     string `json:"title"`
-				Composer  string `json:"composer"`
 				Leadsheet string `json:"leadsheet"`
 			}
 
@@ -109,12 +106,13 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			// TODO : ? add channels to transmit error
+			// TODO add channels to transmit error
 			go restApi.pdfGenerator.GeneratePdfFromBuffer(msg.Leadsheet)
 			httpresponse.Accepted(w)
 
 		case "file":
-			// TODO : handle file upload
+			// TODO handle file upload
+			fallthrough
 
 		default:
 			httpresponse.BadRequest(w)
@@ -137,6 +135,8 @@ func (restApi *RestApi) status(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 
 		status := restApi.pdfGenerator.Status()
+
+		// TODO use an enum for status
 		if status.String() == "" {
 			httpresponse.InternalServerError(w)
 		}
