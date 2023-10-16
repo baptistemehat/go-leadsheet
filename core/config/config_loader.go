@@ -31,3 +31,32 @@ func LoadConfiguration(configPath string) (*Configuration, error) {
 
 	return config, nil
 }
+
+func SaveConfiguration(config *Configuration, configPath string) error {
+
+	// Create config file
+	file, err := os.Create(configPath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := yaml.NewEncoder(file)
+
+	if err := encoder.Encode(&config); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func DefaultConfiguration() (*Configuration, error) {
+	config := &Configuration{
+		Folder:  "",
+		Storage: "",
+		Script:  "",
+		Log:     "",
+	}
+
+	return config, nil
+}

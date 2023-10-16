@@ -9,22 +9,19 @@ import (
 	"github.com/baptistemehat/go-leadsheet/core/pdfgenerator"
 )
 
-// TODO : make this path relative to the app
-const path = "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/config.yaml"
-
 type App struct {
 	restApi *api.RestApi
 }
 
 // NewApp creates a new App
-func NewApp() (*App, error) {
+func NewApp(configPath string) (*App, error) {
 
 	builder := pdfgenerator.Builder{
 		Parser:        parsing.InlineChordParser{},
 		SongFormatter: &latexformatting.LatexSongFormatter{},
 	}
 
-	config, err := config.LoadConfiguration(path)
+	config, err := config.LoadConfiguration(configPath)
 	if err != nil {
 		return nil, err
 	}
