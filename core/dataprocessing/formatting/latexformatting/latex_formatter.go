@@ -187,6 +187,21 @@ func (f *LatexSongFormatter) FormatSongProperties(sp *song.SongProperties) (stri
 // FormatSong
 func (f *LatexSongFormatter) FormatSong(song *song.Song) (string, error) {
 
+	err := os.MkdirAll("latex/tmp", os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	err = os.MkdirAll("latex/tmp/out", os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	err = os.MkdirAll("latex/tmp/songs", os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
 	// TODO centralize filepath of custom config file
 	file, err := os.Create("latex/tmp/user_config.tex")
 	if err != nil {
