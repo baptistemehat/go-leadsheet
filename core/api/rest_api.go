@@ -4,20 +4,20 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/baptistemehat/go-leadsheet/core/api/httpresponse"
 	"github.com/baptistemehat/go-leadsheet/core/common/logger"
-	"github.com/baptistemehat/go-leadsheet/core/httpResponse"
-	"github.com/baptistemehat/go-leadsheet/core/pdfGenerator"
+	"github.com/baptistemehat/go-leadsheet/core/pdfgenerator"
 
 	"github.com/gorilla/mux"
 )
 
 type RestApi struct {
-	pdfGenerator *pdfGenerator.PdfGenerator
+	pdfGenerator *pdfgenerator.PdfGenerator
 	endpoints    map[string]func(http.ResponseWriter, *http.Request)
 }
 
 // NewRestApi creates a new RestApi
-func NewRestApi(p *pdfGenerator.PdfGenerator) (*RestApi, error) {
+func NewRestApi(p *pdfgenerator.PdfGenerator) (*RestApi, error) {
 
 	restApi := &RestApi{
 		pdfGenerator: p,
@@ -58,10 +58,10 @@ func (ri *RestApi) health(w http.ResponseWriter, r *http.Request) {
 
 	// GET
 	case http.MethodGet:
-		httpResponse.SendResponse(w, "ok")
+		httpresponse.SendResponse(w, "ok")
 
 	default:
-		httpResponse.MethodNotAllowed(w)
+		httpresponse.MethodNotAllowed(w)
 	}
 }
 
@@ -77,11 +77,11 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 
 		switch restApi.pdfGenerator.Status() {
 
-		case pdfGenerator.StatusDone:
-			httpResponse.ServeFile(w, r, restApi.pdfGenerator.Output())
+		case pdfgenerator.StatusDone:
+			httpresponse.ServeFile(w, r, restApi.pdfGenerator.Output())
 
 		default:
-			httpResponse.BadRequest(w)
+			httpresponse.BadRequest(w)
 		}
 		return
 
@@ -105,24 +105,24 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 
 			err := json.NewDecoder(r.Body).Decode(&msg)
 			if err != nil {
-				httpResponse.BadRequest(w)
+				httpresponse.BadRequest(w)
 				return
 			}
 
 			// TODO : ? add channels to transmit error
 			go restApi.pdfGenerator.GeneratePdfFromBuffer(msg.Leadsheet)
-			httpResponse.Accepted(w)
+			httpresponse.Accepted(w)
 
 		case "file":
 			// TODO : handle file upload
 
 		default:
-			httpResponse.BadRequest(w)
+			httpresponse.BadRequest(w)
 			return
 		}
 
 	default:
-		httpResponse.MethodNotAllowed(w)
+		httpresponse.MethodNotAllowed(w)
 	}
 }
 
@@ -138,13 +138,13 @@ func (restApi *RestApi) status(w http.ResponseWriter, r *http.Request) {
 
 		status := restApi.pdfGenerator.Status()
 		if status.String() == "" {
-			httpResponse.InternalServerError(w)
+			httpresponse.InternalServerError(w)
 		}
 		// TODO : send JSON response
 		// TODO : add error messages if error
-		httpResponse.SendResponse(w, status.String())
+		httpresponse.SendResponse(w, status.String())
 
 	default:
-		httpResponse.MethodNotAllowed(w)
+		httpresponse.MethodNotAllowed(w)
 	}
 }
