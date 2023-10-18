@@ -139,10 +139,11 @@ func (restApi *RestApi) status(w http.ResponseWriter, r *http.Request) {
 		// TODO use an enum for status
 		if status.String() == "" {
 			httpresponse.InternalServerError(w)
+		} else {
+			// TODO : send JSON response
+			// TODO : add error messages if error
+			httpresponse.SendResponse(w, status.String())
 		}
-		// TODO : send JSON response
-		// TODO : add error messages if error
-		httpresponse.SendResponse(w, status.String())
 
 	default:
 		httpresponse.MethodNotAllowed(w)

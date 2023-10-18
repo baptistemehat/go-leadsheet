@@ -5,7 +5,7 @@ import (
 	"github.com/baptistemehat/go-leadsheet/core/common/logger"
 	"github.com/baptistemehat/go-leadsheet/core/config"
 	"github.com/baptistemehat/go-leadsheet/core/dataprocessing/formatting/latexformatting"
-	parsing "github.com/baptistemehat/go-leadsheet/core/dataprocessing/parsing/inlinechordparsing"
+	"github.com/baptistemehat/go-leadsheet/core/dataprocessing/parsing/inlinechordparsing"
 	"github.com/baptistemehat/go-leadsheet/core/pdfgenerator"
 )
 
@@ -17,7 +17,7 @@ type App struct {
 func NewApp(configPath string) (*App, error) {
 
 	builder := pdfgenerator.Builder{
-		Parser:        parsing.InlineChordParser{},
+		Parser:        inlinechordparsing.InlineChordParser{},
 		SongFormatter: &latexformatting.LatexSongFormatter{},
 	}
 
@@ -28,13 +28,11 @@ func NewApp(configPath string) (*App, error) {
 
 	pdfGenerator, err := pdfgenerator.NewPdfGenerator(builder, *config)
 	if err != nil {
-		logger.Logger.Fatal().Msgf("%s", err)
 		return nil, err
 	}
 
 	restApi, err := api.NewRestApi(pdfGenerator)
 	if err != nil {
-		logger.Logger.Fatal().Msgf("%s", err)
 		return nil, err
 	}
 

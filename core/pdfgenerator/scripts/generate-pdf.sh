@@ -3,7 +3,11 @@ set -e
 
 BASE_DIR=$(dirname "$0")
 
-LATEX_DIR=$BASE_DIR/../../latex
+LATEX_DIR=$BASE_DIR/../../../tmp/latex
+
+# copy latex static files
+cp $BASE_DIR/../../dataprocessing/formatting/latexformatting/latex $BASE_DIR/../../../tmp/ -ar
+
 LATEX_TMP_DIR=$LATEX_DIR/tmp
 LATEX_OUT_DIR=$LATEX_TMP_DIR/out
 LATEX_SONGS_DIR=$LATEX_TMP_DIR/songs

@@ -15,7 +15,7 @@ func SendResponse(w http.ResponseWriter, response string) {
 
 	w.Write([]byte(response))
 
-	logger.Logger.Info().Msgf("response sent: %d %s", status, response)
+	logger.Logger.Debug().Msgf("response sent: %d %s", status, response)
 }
 
 func ServeFile(w http.ResponseWriter, r *http.Request, name string) {
@@ -24,7 +24,7 @@ func ServeFile(w http.ResponseWriter, r *http.Request, name string) {
 
 	http.ServeFile(w, r, name)
 
-	logger.Logger.Info().Msgf("file served: %s", name)
+	logger.Logger.Debug().Msgf("file served: %s", name)
 }
 
 func Accepted(w http.ResponseWriter) {
@@ -37,7 +37,7 @@ func Accepted(w http.ResponseWriter) {
 	response := "accepted"
 	w.Write([]byte(response))
 
-	logger.Logger.Info().Msgf("response sent: %d %s", status, response)
+	logger.Logger.Debug().Msgf("response sent: %d %s", status, response)
 }
 
 func BadRequest(w http.ResponseWriter) {
@@ -50,7 +50,7 @@ func BadRequest(w http.ResponseWriter) {
 	response := "bad request"
 	w.Write([]byte("bad request"))
 
-	logger.Logger.Info().Msgf("response sent: %d %s", status, response)
+	logger.Logger.Debug().Msgf("response sent: %d %s", status, response)
 
 }
 
@@ -64,7 +64,7 @@ func InternalServerError(w http.ResponseWriter) {
 	response := "internal sever error"
 	w.Write([]byte(response))
 
-	logger.Logger.Info().Msgf("response sent: %d %s", status, response)
+	logger.Logger.Debug().Msgf("response sent: %d %s", status, response)
 
 }
 
@@ -78,5 +78,5 @@ func MethodNotAllowed(w http.ResponseWriter) {
 	response := "method not allowed"
 	w.Write([]byte(response))
 
-	logger.Logger.Info().Msgf("response sent: %d %s", status, response)
+	logger.Logger.Debug().Msgf("response sent: %d %s", status, response)
 }

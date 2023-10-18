@@ -1,4 +1,4 @@
-folder: "latex"
+folder: "../tmp/latex"
 storage: "../tmp"
-script: "pdfGenerator/scripts/generate-pdf.sh"
+script: "pdfgenerator/scripts/generate-pdf.sh"
 log: "core.log"

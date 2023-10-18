@@ -55,7 +55,7 @@ type PdfGenerator struct {
 func NewPdfGenerator(builder Builder, config config.Configuration) (*PdfGenerator, error) {
 	p := &PdfGenerator{
 		status:     StatusNotStarted,
-		outputFile: "latex/tmp/out/main.pdf",
+		outputFile: "../tmp/latex/tmp/out/main.pdf",
 		builder:    builder,
 		config:     config,
 	}

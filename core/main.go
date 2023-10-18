@@ -28,8 +28,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Logger
 	logger.Init(zerolog.DebugLevel)
 
+	// App
 	app, err := NewApp(configPath)
 	if err != nil {
 		logger.Logger.Fatal().Msgf("%s", err)
