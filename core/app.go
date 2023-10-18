@@ -4,9 +4,9 @@ import (
 	"github.com/baptistemehat/go-leadsheet/core/api"
 	"github.com/baptistemehat/go-leadsheet/core/common/logger"
 	"github.com/baptistemehat/go-leadsheet/core/config"
-	"github.com/baptistemehat/go-leadsheet/core/pdfGenerator"
-	"github.com/baptistemehat/go-leadsheet/core/song/formatter"
-	"github.com/baptistemehat/go-leadsheet/core/song/parsing"
+	"github.com/baptistemehat/go-leadsheet/core/dataprocessing/formatting/latexformatting"
+	parsing "github.com/baptistemehat/go-leadsheet/core/dataprocessing/parsing/inlinechordparsing"
+	"github.com/baptistemehat/go-leadsheet/core/pdfgenerator"
 )
 
 // TODO : make this path relative to the app
@@ -19,9 +19,9 @@ type App struct {
 // NewApp creates a new App
 func NewApp() (*App, error) {
 
-	builder := pdfGenerator.Builder{
-		Parser:    parsing.InlineChordParser{},
-		Formatter: &formatter.LatexSongFormatter{},
+	builder := pdfgenerator.Builder{
+		Parser:        parsing.InlineChordParser{},
+		SongFormatter: &latexformatting.LatexSongFormatter{},
 	}
 
 	config, err := config.LoadConfiguration(path)
@@ -29,7 +29,7 @@ func NewApp() (*App, error) {
 		return nil, err
 	}
 
-	pdfGenerator, err := pdfGenerator.NewPdfGenerator(builder, *config)
+	pdfGenerator, err := pdfgenerator.NewPdfGenerator(builder, *config)
 	if err != nil {
 		logger.Logger.Fatal().Msgf("%s", err)
 		return nil, err
