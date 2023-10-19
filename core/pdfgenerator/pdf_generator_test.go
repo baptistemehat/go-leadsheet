@@ -14,7 +14,7 @@ func TestGeneratePdfFromBuffer(t *testing.T) {
 		SongFormatter: &latexformatting.LatexSongFormatter{},
 	}
 
-	path := "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/core/config/testResources/config.yaml"
+	path := "config/testResources/config.yaml"
 	config, err := config.LoadConfiguration(path)
 
 	if err != nil {

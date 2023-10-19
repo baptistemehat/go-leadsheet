@@ -187,17 +187,17 @@ func (f *LatexSongFormatter) FormatSongProperties(sp *song.SongProperties) (stri
 // FormatSong
 func (f *LatexSongFormatter) FormatSong(song *song.Song) (string, error) {
 
-	err := os.MkdirAll("latex/tmp", os.ModePerm)
+	err := os.MkdirAll("../tmp/latex/tmp", os.ModePerm)
 	if err != nil {
 		return "", err
 	}
 
-	err = os.MkdirAll("latex/tmp/out", os.ModePerm)
+	err = os.MkdirAll("../tmp/latex/tmp/out", os.ModePerm)
 	if err != nil {
 		return "", err
 	}
 
-	err = os.MkdirAll("latex/tmp/songs", os.ModePerm)
+	err = os.MkdirAll("../tmp/latex/tmp/songs", os.ModePerm)
 	if err != nil {
 		return "", err
 	}
