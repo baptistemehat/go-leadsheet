@@ -1,30 +1,41 @@
 # Go-leadsheet
 
-## Overview
-Go-leadsheet is a leadsheet editor web app, written in Golang and React.
+A web application for editing leadsheets.
 
-Here, the term "leadsheet" refers to a form of musical notation for songs, containing lyrics and chords of a song. 
+Go-leadsheet is still at an early stage of development. The main basic features are developped and I'm currently working on making the app usable. The first version should be out soon !
 
+## About the project
+Go-leadsheet is a web application for editing leadsheets, ie. song lyrics and the associated chords.
+It provides a web interface for editing leadsheets and downloading them in pdf.
 
-Such notations are really useful for musicians willing to ...
-Songs written in this format can be found on various guitar tab websites such as....
+[Image of Go-leadsheet: UI on right side, pdf result on left side]
 
+Lyrics and chords can be edited using a simple syntax, similar to what can be found on websites such as ...
+The app then parses the lyrics and chords of the song and generates a PDF file using LaTeX.
 
-Although widespread in the amateur music community, few solutions exist to create "well formatted that would align the chords at the right position, no matter the font or font size"
-The other solutions include Chordpro, leadsheet latex package, ....
+The back-end of the app is written in Golang and relies on Clemens Niederberger's leadsheets LaTeX package for pdf generation. The front-end is written in React.
 
-Being used to writing documents in LaTeX, I gave the latex package a tried.I was really pleased with the result: the clean, slick look of Latex documents, perfect placement or chords, ability to customize headers, format of sections,... Better than ascii
+## Status
 
-But the major drawback of this solution was that it uses LaTeX. Which is clearly a pain in the arse to write, especially for new users.
+Some features and improvements still need to be added before the first version is released:
+
+### Back-end
+- [ ] Create data pipelines for data processing
+- [ ] Improve management of temporary files 
+- [ ] Make more parameters configurable (eg. ip address)
+- [ ] Reduce usage of bash scripts for pdf generation (see gotex)
+- [ ] Add missing tests on back-end functions
+
+### Front-end
+- [ ] Forward errors from back-end to front-end
+- [ ] Automatically pull back-end status
+
+### CI/CD
+- [ ] Create docker container for the app
+- [ ] Setup CI/CD
+
+## Installation
+An installation process will be provided soon !
 
 ## Contributing
-
-## Build
-
-
-### TODOs
-Lots of TODOs are still dispersed in the source code
-...
-
-Still relies on scripts to launch latex
-
+This repo is still in an early stage of development and is not open for contribution yet.
