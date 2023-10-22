@@ -8,7 +8,7 @@ Go-leadsheet is still at an early stage of development. The main basic features 
 Go-leadsheet is a web application for editing leadsheets, ie. song lyrics and the associated chords.
 It provides a web interface for editing leadsheets and downloading them in pdf.
 
-[Image of Go-leadsheet: UI on right side, pdf result on left side]
+![](ui-pdf-screenshot.png)
 
 Lyrics and chords can be edited using a simple syntax, similar to what can be found on websites such as ...
 The app then parses the lyrics and chords of the song and generates a PDF file using LaTeX.
