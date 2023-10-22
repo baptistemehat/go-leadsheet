@@ -119,23 +119,23 @@ class SongForm extends React.Component {
         <form className="SongForm" onSubmit={this.handleSubmit}>
           <div className='Leadsheet-fields'>
             <div>
-                <label>Leadsheet:</label>
+                <label>Leadsheet</label>
             </div>
             <div>
                 <textarea className='leadsheet-text-area' value={this.state.leadsheet} onChange={this.handleLeadsheetChange} />
             </div>
           </div>
-  
-          <input type="submit" value="Generate" />
-        
-          <div>
+ 
+          <div className="button-line">
+            <input type="submit" value="Generate" />
             <input className="" type="button" value="Check generation status" onClick={this.handleCheckGenerationStatus} />
-            <label>Generation {this.state.generationStatus}</label>
+            <input type="button" value="Download file" onClick={this.handleDownloadPdf} />
+          </div>
+
+          <div>
+            <label> Generation {this.state.generationStatus}</label>
           </div>
          
-         <div>
-            <input type="button" value="Download file" onClick={this.handleDownloadPdf} />
-         </div>
         </form>
       );
     }
