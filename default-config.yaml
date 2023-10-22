@@ -1,4 +1,4 @@
-folder: "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/core/latex"
-storage: "/home/baptiste/tmp/go-leadsheet"
-script: "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/core/pdfGenerator/scripts/generate-pdf.sh"
-log: "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/core/core.log"
+folder: "../tmp/latex"
+storage: "../tmp"
+script: "pdfgenerator/scripts/generate-pdf.sh"
+log: "core.log"

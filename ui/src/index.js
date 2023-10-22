@@ -4,40 +4,6 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-class SongForm extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      metadata: [],
-      leadsheet: 'Type your lyrics and chords here',
-    };
-
-    this.handleLeadsheetChange = this.handleLeadsheetChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleLeadsheetChange(event) {
-    this.setState({leadsheet: event.target.value});
-  }
-
-  handleSubmit(event) {
-    console.log(this.state.leadsheet);
-    event.preventDefault();
-  }
-
-  render() {
-    return(
-      <form onSubmit={this.handleSubmit}>
-        <label>Title:
-          <textarea value={this.state.leadsheet} onChange={this.handleLeadsheetChange} />
-        </label>
-        <input type="submit" value="Submit" on />
-      </form>
-    );
-  }
-
-}
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

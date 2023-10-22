@@ -1,5 +1,8 @@
+core/bin
 core/main
 core/**.pdf
 core/latex/tmp
+core/latex/main.aux
+core/latex/main.pdf
 tmp/
 **.log

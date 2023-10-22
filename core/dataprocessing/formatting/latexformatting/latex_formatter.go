@@ -147,7 +147,7 @@ func (f *LatexSongFormatter) FormatSection(section *song.Section) (string, error
 		// Write input to file
 		buffer := fmt.Sprintf("\\newversetype{%s}[template=SideName, after-label={}, name={%s}]", LatexEscape(section.Name), LatexEscape(section.Name))
 		// TODO : make WriteStringToFile a util function (and make it append to file)
-		if err := AppendToFile(buffer, "latex/tmp/user_config.tex"); err != nil {
+		if err := AppendToFile(buffer, "../tmp/latex/tmp/user_config.tex"); err != nil {
 			//TODO error handling
 		}
 		userDefinedSectionNames = append(userDefinedSectionNames, section.Name)
@@ -187,8 +187,23 @@ func (f *LatexSongFormatter) FormatSongProperties(sp *song.SongProperties) (stri
 // FormatSong
 func (f *LatexSongFormatter) FormatSong(song *song.Song) (string, error) {
 
+	err := os.MkdirAll("../tmp/latex/tmp", os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	err = os.MkdirAll("../tmp/latex/tmp/out", os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	err = os.MkdirAll("../tmp/latex/tmp/songs", os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
 	// TODO centralize filepath of custom config file
-	file, err := os.Create("latex/tmp/user_config.tex")
+	file, err := os.Create("../tmp/latex/tmp/user_config.tex")
 	if err != nil {
 		return "", err
 	}

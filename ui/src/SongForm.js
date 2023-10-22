@@ -6,16 +6,7 @@ import React from 'react';
 class SongForm extends React.Component {
     constructor(props) {
       super(props);
-      this.state = {
-  
-        /**
-         * Song metadata (title, composer, etc.)
-         */
-        metadata: {
-          title: '',
-          composer: '',
-        },
-  
+      this.state = {  
         /**
          * Content of the 'leadsheet' text area
          */
@@ -28,7 +19,6 @@ class SongForm extends React.Component {
       };
   
       this.handleLeadsheetChange = this.handleLeadsheetChange.bind(this);
-      this.handleMetadataChange = this.handleMetadataChange.bind(this)
       this.handleSubmit = this.handleSubmit.bind(this);
       this.handleCheckGenerationStatus = this.handleCheckGenerationStatus.bind(this)
     }
@@ -39,22 +29,6 @@ class SongForm extends React.Component {
      */
     handleLeadsheetChange(event) {
       this.setState({leadsheet: event.target.value});
-    }
-  
-    /**
-     * Handles changes in metadata text fields (title, composer, etc.)
-     * @param {Event} event 
-     */
-    handleMetadataChange(event) {
-  
-      // create copy of current metadata and merge the new value into it
-      var newMetadata = {
-        ...this.state.metadata,
-        [event.target.name] : event.target.value
-      }
-  
-      // update current metadata
-      this.setState({metadata: newMetadata});
     }
   
     // TODO : implement
@@ -143,29 +117,6 @@ class SongForm extends React.Component {
       return(
         
         <form className="SongForm" onSubmit={this.handleSubmit}>
-          <div className='Metadata-fields'>
-            <div>
-                <label>Title:
-                <input 
-                    name="title"
-                    type="text" 
-                    value={this.state.metadata.title} 
-                    onChange={this.handleMetadataChange} />
-                </label>
-            </div>
-            
-            <div>
-                <label>Composer:
-                <input
-                    name="composer"
-                    type="text"
-                    value={this.state.metadata.composer}
-                    onChange={this.handleMetadataChange} />
-                </label>
-            </div>
-          </div>
-           
-  
           <div className='Leadsheet-fields'>
             <div>
                 <label>Leadsheet:</label>

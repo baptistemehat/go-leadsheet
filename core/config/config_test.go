@@ -9,16 +9,17 @@ import (
 
 func TestLoadConfiguration(t *testing.T) {
 
-	// TODO : write config file here
+	// TODO write config file here
 	// and defer deletion
 
-	path := "/home/baptiste/Programing/projects/github.com/baptistemehat/go-leadsheet/core/config/testResources/config.yaml"
+	// TODO test that configuration is properly loaded with the proper values
+
+	path := "testResources/config.yaml"
 	config, err := LoadConfiguration(path)
 
 	assert.NoError(t, err, "should not return error")
 
 	fmt.Println(config)
-
 }
 
 func TestLoadConfiguration_UnknownFile(t *testing.T) {
