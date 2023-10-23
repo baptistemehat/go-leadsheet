@@ -13,7 +13,7 @@ It provides a web interface for editing leadsheets and downloading them in pdf.
 Lyrics and chords can be edited using a simple syntax, similar to what can be found on websites such as [ultimate-guitar.com](https://www.ultimate-guitar.com) or [e-chords.com](https://www.e-chords.com) for instance.
 The app then parses the lyrics and chords of the song and generates a PDF file using LaTeX.
 
-The back-end of the app is written in Golang and relies on Clemens Niederberger's leadsheets LaTeX package for pdf generation. The front-end is written in React.
+The back-end of the app is written in Golang and relies on [Clemens Niederberger's leadsheets LaTeX package](https://www.ctan.org/pkg/leadsheets) for pdf generation. The front-end is written in React.
 
 ## State of development
 
