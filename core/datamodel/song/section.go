@@ -10,9 +10,9 @@ type Section struct {
 
 // Formatter
 type SectionFormatter interface {
-	FormatChord(*music.Chord) (string, error)
-	FormatLine(*Line) (string, error)
-	FormatSection(*Section) (string, error)
+	FormatChord(music.Chord) (string, error)
+	FormatLine(Line) (string, error)
+	FormatSection(Section) (string, error)
 }
 
 // NewSection
@@ -63,5 +63,5 @@ func (section *Section) TrimEmptyLines() Section {
 
 // Format
 func (section *Section) Format(f SectionFormatter) (string, error) {
-	return f.FormatSection(section)
+	return f.FormatSection(*section)
 }

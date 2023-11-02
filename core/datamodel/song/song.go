@@ -12,11 +12,11 @@ type Song struct {
 
 // Formatter
 type SongFormatter interface {
-	FormatChord(*music.Chord) (string, error)
-	FormatLine(*Line) (string, error)
-	FormatSection(*Section) (string, error)
-	FormatSongProperties(*SongProperties) (string, error)
-	FormatSong(*Song) (string, error)
+	FormatChord(music.Chord) (string, error)
+	FormatLine(Line) (string, error)
+	FormatSection(Section) (string, error)
+	FormatSongProperties(SongProperties) (string, error)
+	FormatSong(Song) (string, error)
 }
 
 // NewSong
@@ -39,5 +39,5 @@ func (song *Song) SetProperties(sp SongProperties) {
 
 // Format
 func (song *Song) Format(f SongFormatter) (string, error) {
-	return f.FormatSong(song)
+	return f.FormatSong(*song)
 }

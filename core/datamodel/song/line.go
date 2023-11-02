@@ -20,8 +20,8 @@ type Line struct {
 
 // Formatter
 type LineFormatter interface {
-	FormatChord(*music.Chord) (string, error)
-	FormatLine(*Line) (string, error)
+	FormatChord(music.Chord) (string, error)
+	FormatLine(Line) (string, error)
 }
 
 // NewLine
@@ -93,5 +93,5 @@ func (line *Line) IsEmpty() bool {
 
 // Format
 func (line *Line) Format(f LineFormatter) (string, error) {
-	return f.FormatLine(line)
+	return f.FormatLine(*line)
 }

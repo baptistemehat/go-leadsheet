@@ -28,7 +28,7 @@ type Chord struct {
 
 // Formatter
 type ChordFormatter interface {
-	FormatChord(*Chord) (string, error)
+	FormatChord(Chord) (string, error)
 }
 
 // NewChord creates a new chord
@@ -153,5 +153,5 @@ func (chord *Chord) String() (string, error) {
 
 // Format
 func (c *Chord) Format(f ChordFormatter) (string, error) {
-	return f.FormatChord(c)
+	return f.FormatChord(*c)
 }

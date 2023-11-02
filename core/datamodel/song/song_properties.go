@@ -18,12 +18,12 @@ type SongProperties struct {
 
 // Formatter
 type SongPropertiesFormatter interface {
-	FormatSongProperties(*SongProperties) (string, error)
+	FormatSongProperties(SongProperties) (string, error)
 }
 
 // Format
 func (sp *SongProperties) Format(f SongPropertiesFormatter) (string, error) {
-	return f.FormatSongProperties(sp)
+	return f.FormatSongProperties(*sp)
 }
 
 // SetProperty
