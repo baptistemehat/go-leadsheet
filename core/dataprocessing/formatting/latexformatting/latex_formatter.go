@@ -39,7 +39,7 @@ func LatexEscape(latexString string) string {
 }
 
 // FormatChord
-func (f *LatexSongFormatter) FormatChord(chord *music.Chord) (string, error) {
+func (f *LatexSongFormatter) FormatChord(chord music.Chord) (string, error) {
 
 	// Latex formatting : "\chord{E7}" OR "^{E7}"
 
@@ -57,7 +57,7 @@ func InsertString(source string, insert string, index uint8) (string, error) {
 }
 
 // FormatLine
-func (f *LatexSongFormatter) FormatLine(line *song.Line) (string, error) {
+func (f *LatexSongFormatter) FormatLine(line song.Line) (string, error) {
 
 	// Latex formatting : "\chord{Am} On a dark desert highway,\chord{E7} cool wind in my hair \\"
 
@@ -137,7 +137,7 @@ func AppendToFile(buffer, fileName string) error {
 }
 
 // FormatSection
-func (f *LatexSongFormatter) FormatSection(section *song.Section) (string, error) {
+func (f *LatexSongFormatter) FormatSection(section song.Section) (string, error) {
 
 	// Latex formatting : \begin{Verse} ... \end{Verse}
 
@@ -170,7 +170,7 @@ func (f *LatexSongFormatter) FormatSection(section *song.Section) (string, error
 }
 
 // FormatSongProperties
-func (f *LatexSongFormatter) FormatSongProperties(sp *song.SongProperties) (string, error) {
+func (f *LatexSongFormatter) FormatSongProperties(sp song.SongProperties) (string, error) {
 
 	// Temporary implementation
 
@@ -185,7 +185,7 @@ func (f *LatexSongFormatter) FormatSongProperties(sp *song.SongProperties) (stri
 }
 
 // FormatSong
-func (f *LatexSongFormatter) FormatSong(song *song.Song) (string, error) {
+func (f *LatexSongFormatter) FormatSong(song song.Song) (string, error) {
 
 	err := os.MkdirAll("../tmp/latex/tmp", os.ModePerm)
 	if err != nil {
