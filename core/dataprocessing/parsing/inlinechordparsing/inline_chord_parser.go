@@ -11,6 +11,7 @@ import (
 	lexingFunctions "github.com/baptistemehat/go-leadsheet/core/dataprocessing/parsing/inlinechordparsing/lexing/lexingfunctions"
 )
 
+
 type DefaultScheme struct {
 }
 
@@ -18,6 +19,7 @@ type DefaultScheme struct {
 type InlineChordParser struct {
 	Scheme DefaultScheme
 }
+
 
 // Parse
 func (p InlineChordParser) Parse(input string) (song_pkg.Song, error) {
@@ -122,3 +124,4 @@ func (p InlineChordParser) Parse(input string) (song_pkg.Song, error) {
 
 	return song, nil
 }
+

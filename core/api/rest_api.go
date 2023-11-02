@@ -6,22 +6,24 @@ import (
 
 	"github.com/baptistemehat/go-leadsheet/core/api/httpresponse"
 	"github.com/baptistemehat/go-leadsheet/core/common/logger"
-	"github.com/baptistemehat/go-leadsheet/core/pdfgenerator"
+	"github.com/baptistemehat/go-leadsheet/core/dataprocessing"
 
 	"github.com/gorilla/mux"
 )
 
 type RestApi struct {
-	pdfGenerator *pdfgenerator.PdfGenerator
-	endpoints    map[string]func(http.ResponseWriter, *http.Request)
+    //	pdfGenerator *pdfgenerator.PdfGenerator
+	leadsheetProcessor *dataprocessing.LeadsheetProcessor 
+    endpoints    map[string]func(http.ResponseWriter, *http.Request)
 }
 
 // NewRestApi creates a new RestApi
-func NewRestApi(p *pdfgenerator.PdfGenerator) (*RestApi, error) {
+func NewRestApi() (*RestApi, error) {
 
 	restApi := &RestApi{
-		pdfGenerator: p,
-		endpoints:    make(map[string]func(http.ResponseWriter, *http.Request)),
+		// pdfGenerator: p,
+		leadsheetProcessor: dataprocessing.NewLeadsheetProcessor(),
+        endpoints:    make(map[string]func(http.ResponseWriter, *http.Request)),
 	}
 
 	restApi.endpoints["/api/health"] = restApi.health
@@ -75,10 +77,10 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 	// GET
 	case http.MethodGet:
 
-		switch restApi.pdfGenerator.Status() {
+		switch restApi.leadsheetProcessor.Status() {
 
-		case pdfgenerator.StatusDone:
-			httpresponse.ServeFile(w, r, restApi.pdfGenerator.Output())
+		case dataprocessing.StatusDone:
+			httpresponse.ServeFile(w, r, restApi.leadsheetProcessor.Output())
 
 		default:
 			httpresponse.BadRequest(w)
@@ -107,8 +109,11 @@ func (restApi *RestApi) song(w http.ResponseWriter, r *http.Request) {
 			}
 
 			// TODO add channels to transmit error
-			go restApi.pdfGenerator.GeneratePdfFromBuffer(msg.Leadsheet)
-			httpresponse.Accepted(w)
+			//go restApi.pdfGenerator.GeneratePdfFromBuffer(msg.Leadsheet)
+			
+            restApi.leadsheetProcessor.Configure(msg.Configuration)
+            go restApi.leadsheetProcessor.GeneratePdf(msg.Leadsheet)
+            httpresponse.Accepted(w)
 
 		case "file":
 			// TODO handle file upload
@@ -134,7 +139,7 @@ func (restApi *RestApi) status(w http.ResponseWriter, r *http.Request) {
 	// GET
 	case http.MethodGet:
 
-		status := restApi.pdfGenerator.Status()
+		status := restApi.leadsheetProcessor.Status()
 
 		// TODO use an enum for status
 		if status.String() == "" {

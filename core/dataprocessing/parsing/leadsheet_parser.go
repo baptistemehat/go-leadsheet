@@ -1,6 +1,8 @@
 package parsing
 
-import "github.com/baptistemehat/go-leadsheet/core/datamodel/song"
+import (
+	"github.com/baptistemehat/go-leadsheet/core/datamodel/song"
+)
 
 // Parser
 type LeadsheetParser interface {
