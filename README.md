@@ -5,15 +5,55 @@ A web leadsheet editor.
 > go-leadsheet is still at an early stage of development. The main basic features are developped and I'm currently working on making the app usable. The first version should be out soon !
 
 ## About the project
-Go-leadsheet is a web application for editing leadsheets, ie. song lyrics and the associated chords.
-It provides a web interface for editing leadsheets and downloading them in pdf.
+Go-leadsheet is a web application for typesetting leadsheets (ie. song lyrics and the associates chords).
 
-![](ui-pdf-screenshot.png)
+In other words, it helps you go from this:
+
+
+To this:
+
+without having to learn anything about ... LateX or format it in MS Word.
+
+
+## Specs
+
+### Currently supported input formats
+- [x] Inline chords
+- [ ] Chord line
+- [ ] ChordPro
+
+### Currently supported output formats
+- [ ] Latex generated pdf
+- [ ] Latex
+- [ ] Markdown
+- [ ] HTML
+
+
+It enables to transform commonly used lyrics-chord notations into uniformly formatted pdf leadsheets.
+![ui-screenshot](ui-pdf-screenshot.png)
 
 Lyrics and chords can be edited using a simple syntax, similar to what can be found on websites such as [ultimate-guitar.com](https://www.ultimate-guitar.com) or [e-chords.com](https://www.e-chords.com) for instance.
 The app then parses the lyrics and chords of the song and generates a PDF file using LaTeX.
 
 The back-end of the app is written in Golang and relies on [Clemens Niederberger's leadsheets LaTeX package](https://www.ctan.org/pkg/leadsheets) for pdf generation. The front-end is written in React.
+
+## How does it work
+
+This section provides a quick overview of how this application operates under the hood.
+
+The application consists of two modules:
+
+* a user interface, which provides a basic web interface for editing leadsheets
+* a "core" module, which parses the inputted leadsheets and generates the associated pdf 
+
+The core module provides an HTTP API. The UI uses this API to communicate with the core module.
+
+Both modules interact 
+
+### User Interface
+
+### Golang Core
+
 
 ## State of development
 
@@ -36,6 +76,19 @@ Some features and improvements still need to be added before the first version i
 
 ## Installation
 An installation process will be provided soon !
+
+## Q&A
+
+### Why Golang ?
+
+### Why Latex ?
+
+### Why use this input format rather than ChrodPro ?
+
+### Why HTTP API ?
+
+## Roadmap
+* Create a dedicated lib for representing songs
 
 ## Contributing
 This repo is still in an early stage of development and is not open for contribution yet.
